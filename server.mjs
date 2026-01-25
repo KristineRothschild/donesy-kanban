@@ -84,6 +84,7 @@ app.put("/boards/:id", (req, res, next) => {
 
   const currentBoard = boards[boardIndex];
   const updatedBoard = {
+    ...currentBoard,
     name: name?.trim() || currentBoard.name,
     description: description?.trim() || currentBoard.description,
     updatedAt: new Date().toISOString(),
