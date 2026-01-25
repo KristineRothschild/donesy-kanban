@@ -26,6 +26,17 @@ app.get("/boards", (req, res) => {
   res.json({ boards });
 });
 
+app.get("/boards/:id", (req, res, next) => {
+  const boardId = parseInt(req.params.id);
+  const board = boards.find((b) => b.id === boardId);
+
+  if (!board) {
+    return next(new NotFoundError("Board", boardId));
+  }
+
+  res.json({ board });
+});
+
 app.use(express.static("public"));
 
 app.use(errorHandler);
