@@ -37,6 +37,32 @@ app.get("/boards/:id", (req, res, next) => {
   res.json({ board });
 });
 
+app.post("/boards", (req, res, next) => {
+  const { name, description } = req.body;
+
+  const errors = [];
+  if (!name || typeof name !== "string" || name.trim() === "") {
+    errors.push({
+      field: "name",
+      message: "Name is required and must be a non-empty string",
+    });
+  }
+
+  if (errors.length > 0) {
+    return next(new ValidationError(errors));
+  }
+
+  const newBoard = {
+    id: nextBoardId++,
+    name: name.trim(),
+    description: description?.trim() || null,
+    createdAt: new Date().toISOString(),
+  };
+  boards.push(newBoard);
+
+  res.status(201).json({ board: newBoard });
+});
+
 app.use(express.static("public"));
 
 app.use(errorHandler);
