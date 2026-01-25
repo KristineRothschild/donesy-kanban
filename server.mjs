@@ -93,6 +93,19 @@ app.put("/boards/:id", (req, res, next) => {
   res.json({ board: updatedBoard });
 });
 
+app.delete("/boards/:id", (req, res, next) => {
+  const boardId = parseInt(req.params.id);
+  const boardIndex = boards.findIndex((b) => b.id === boardId);
+
+  if (boardIndex === -1) {
+    return next(new NotFoundError("Board", boardId));
+  }
+
+  boards.splice(boardIndex, 1);
+
+  res.status(204).send();
+});
+
 app.use(express.static("public"));
 
 app.use(errorHandler);
