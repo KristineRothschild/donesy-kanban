@@ -63,6 +63,36 @@ app.post("/boards", (req, res, next) => {
   res.status(201).json({ board: newBoard });
 });
 
+app.put("/boards/:id", (req, res, next) => {
+  const boardId = parseInt(req.params.id);
+  const boardIndex = boards.findIndex((b) => b.id === boardId);
+
+  if (boardIndex === -1) {
+    return next(new NotFoundError("Board", boardId));
+  }
+
+  const { name, description } = req.body;
+
+  const errors = [];
+  if (name !== undefined && (typeof name !== "string" || name.trim() === "")) {
+    errors.push({ field: "name", message: "Name cannot be empty" });
+  }
+
+  if (errors.length > 0) {
+    return next(new ValidationError(errors));
+  }
+
+  const currentBoard = boards[boardIndex];
+  const updatedBoard = {
+    name: name?.trim() || currentBoard.name,
+    description: description?.trim() || currentBoard.description,
+    updatedAt: new Date().toISOString(),
+  };
+  boards[boardIndex] = updatedBoard;
+
+  res.json({ board: updatedBoard });
+});
+
 app.use(express.static("public"));
 
 app.use(errorHandler);
