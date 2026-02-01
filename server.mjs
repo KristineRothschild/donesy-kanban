@@ -6,6 +6,9 @@ const PORT = 8080;
 
 app.use(express.json());
 
+const users = [];
+let nextUserId = 1;
+
 const boards = [
   {
     id: 1,
@@ -21,6 +24,59 @@ const boards = [
   },
 ];
 let nextBoardId = 3;
+
+app.get("/users", (req, res) => {
+  res.json({ users });
+});
+
+app.get("/users/:id", (req, res, next) => {
+  const userId = parseInt(req.params.id);
+  const user = users.find((u) => u.id === userId);
+
+  if (!user) {
+    return next(new NotFoundError("User", userId));
+  }
+
+  res.json({ user });
+});
+
+app.post("/users", (req, res, next) => {
+  const { email, password, acceptedTos, acceptedPrivacy } = req.body;
+
+  if (!email || !password) {
+    return next(new ValidationError([], "Email and password are required"));
+  }
+
+  if (!acceptedTos || !acceptedPrivacy) {
+    return next(
+      new ValidationError(
+        [],
+        "You must accept Terms of Service and Privacy Policy",
+      ),
+    );
+  }
+
+  const existingUser = users.find((u) => u.email === email.toLowerCase());
+  if (existingUser) {
+    return next(new ValidationError([], "Email is already registered"));
+  }
+
+  const newUser = {
+    id: nextUserId++,
+    email: email.toLowerCase(),
+    password: password,
+    createdAt: new Date().toISOString(),
+  };
+  users.push(newUser);
+
+  res.status(201).json({
+    user: {
+      id: newUser.id,
+      email: newUser.email,
+      createdAt: newUser.createdAt,
+    },
+  });
+});
 
 app.get("/boards", (req, res) => {
   res.json({ boards });
