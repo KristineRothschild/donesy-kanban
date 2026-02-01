@@ -78,6 +78,28 @@ app.post("/users", (req, res, next) => {
   });
 });
 
+app.post("/users/login", (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return next(new ValidationError([], "Email and password are required"));
+  }
+
+  const user = users.find((u) => u.email === email.toLowerCase());
+
+  if (!user || user.password !== password) {
+    return next(new ValidationError([], "Invalid email or password"));
+  }
+
+  res.json({
+    user: {
+      id: user.id,
+      email: user.email,
+      createdAt: user.createdAt,
+    },
+  });
+});
+
 app.get("/boards", (req, res) => {
   res.json({ boards });
 });
