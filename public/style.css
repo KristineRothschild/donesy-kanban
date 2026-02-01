@@ -1,0 +1,269 @@
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #5b9bd5;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.container {
+  width: 100%;
+  max-width: 900px;
+}
+
+.app-title {
+  text-align: center;
+  color: white;
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Auth wrapper for side-by-side layout */
+.auth-wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+/* Auth card styling */
+.auth-card {
+  background-color: #a4c8e8;
+  border-radius: 10px;
+  padding: 40px 30px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.auth-card h2 {
+  text-align: center;
+  color: #4a7ba7;
+  font-size: 1.5rem;
+  margin-bottom: 25px;
+  letter-spacing: 2px;
+}
+
+/* Input groups */
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  background-color: white;
+  color: #5b9bd5;
+}
+
+.input-group input::placeholder {
+  color: #5b9bd5;
+  opacity: 0.8;
+}
+
+.input-group input:focus {
+  outline: 2px solid #4a7ba7;
+}
+
+/* Auth button */
+.auth-btn {
+  width: 100%;
+  padding: 15px;
+  background-color: #4a7ba7;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s;
+}
+
+.auth-btn:hover {
+  background-color: #3d6a91;
+}
+
+.logout-btn {
+  background-color: #6c8ea8;
+  margin-bottom: 10px;
+}
+
+.logout-btn:hover {
+  background-color: #5a7a92;
+}
+
+.danger-btn {
+  background-color: #c75050;
+}
+
+.danger-btn:hover {
+  background-color: #a84040;
+}
+
+/* Consent section */
+.consent-section {
+  margin: 15px 0;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.checkbox-group label {
+  color: #4a7ba7;
+  font-size: 0.9rem;
+}
+
+.checkbox-group a {
+  color: #2d5a7b;
+  text-decoration: underline;
+}
+
+/* Messages */
+.message {
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 5px;
+  text-align: center;
+  display: none;
+}
+
+.message.success {
+  display: block;
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.message.error {
+  display: block;
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Switch text */
+.switch-text {
+  text-align: center;
+  margin-top: 20px;
+  color: #4a7ba7;
+  font-size: 0.9rem;
+}
+
+.switch-text a {
+  color: #2d5a7b;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.switch-text a:hover {
+  text-decoration: underline;
+}
+
+/* User card */
+.user-card {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+#user-info {
+  background: rgba(255, 255, 255, 0.5);
+  padding: 20px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+#user-info p {
+  margin: 10px 0;
+  color: #4a7ba7;
+}
+
+/* Document pages (ToS and Privacy Policy) */
+main {
+  background-color: #a4c8e8;
+  border-radius: 10px;
+  padding: 40px 30px;
+  max-width: 600px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+main h1 {
+  color: #4a7ba7;
+  margin-bottom: 20px;
+}
+
+main h2 {
+  color: #4a7ba7;
+  margin-top: 25px;
+  margin-bottom: 10px;
+}
+
+main p, main li {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+main ul {
+  margin-left: 20px;
+  margin-bottom: 15px;
+}
+
+main a {
+  color: #2d5a7b;
+}
+
+.close-btn {
+  display: block;
+  margin: 30px auto 0;
+  padding: 12px 30px;
+  background-color: #4a7ba7;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.close-btn:hover {
+  background-color: #3d6a91;
+}
+
+/* Hidden class */
+.hidden {
+  display: none !important;
+}
+
+/* Responsive design */
+@media (max-width: 800px) {
+  .auth-wrapper {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .auth-card {
+    max-width: 100%;
+  }
+}
