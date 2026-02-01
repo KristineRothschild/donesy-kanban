@@ -10,7 +10,7 @@ export async function createUser(userData) {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || "Could not create user");
+    throw new Error(data.error?.message || "Could not create user");
   }
 
   return data.user;
@@ -28,7 +28,7 @@ export async function loginUser(email, password) {
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || "Could not login");
+    throw new Error(data.error?.message || "Could not login");
   }
 
   return data.user;
@@ -41,7 +41,7 @@ export async function deleteUser(userId) {
 
   if (!response.ok) {
     const data = await response.json();
-    throw new Error(data.message || "Could not delete user");
+    throw new Error(data.error?.message || "Could not delete user");
   }
 
   return true;
