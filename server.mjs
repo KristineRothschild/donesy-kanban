@@ -1,13 +1,27 @@
 import express from "express";
+import fs from "fs";
 import errorHandler, { NotFoundError, ValidationError } from "./middleware.mjs";
 
 const app = express();
 const PORT = 8080;
+const USERS_FILE = "users.json";
 
 app.use(express.json());
 
-const users = [];
-let nextUserId = 1;
+function loadUsers() {
+  if (fs.existsSync(USERS_FILE)) {
+    const data = fs.readFileSync(USERS_FILE, "utf-8");
+    return JSON.parse(data);
+  }
+  return [];
+}
+
+function saveUsers() {
+  fs.writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
+}
+
+const users = loadUsers();
+let nextUserId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
 
 const boards = [
   {
@@ -68,6 +82,7 @@ app.post("/users", (req, res, next) => {
     createdAt: new Date().toISOString(),
   };
   users.push(newUser);
+  saveUsers();
 
   res.status(201).json({
     user: {
@@ -109,6 +124,7 @@ app.delete("/users/:id", (req, res, next) => {
   }
 
   users.splice(userIndex, 1);
+  saveUsers();
 
   res.status(204).send();
 });
