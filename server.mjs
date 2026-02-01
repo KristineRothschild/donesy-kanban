@@ -100,6 +100,19 @@ app.post("/users/login", (req, res, next) => {
   });
 });
 
+app.delete("/users/:id", (req, res, next) => {
+  const userId = parseInt(req.params.id);
+  const userIndex = users.findIndex((u) => u.id === userId);
+
+  if (userIndex === -1) {
+    return next(new NotFoundError("User", userId));
+  }
+
+  users.splice(userIndex, 1);
+
+  res.status(204).send();
+});
+
 app.get("/boards", (req, res) => {
   res.json({ boards });
 });
