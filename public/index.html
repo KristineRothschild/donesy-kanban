@@ -1,11 +1,147 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Donesy Kanban</title>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h1>Welcome to Donesy Kanban</h1>
+    <div class="container">
+      <h1 class="app-title">Donesy Kanban</h1>
+
+      <div class="auth-wrapper">
+        <!-- Login Card -->
+        <div class="auth-card" id="login-section">
+          <h2>LOGIN</h2>
+
+          <form id="login-form">
+            <div class="input-group">
+              <input
+                type="email"
+                id="login-email"
+                name="email"
+                required
+                placeholder="E-mail"
+              />
+            </div>
+
+            <div class="input-group">
+              <input
+                type="password"
+                id="login-password"
+                name="password"
+                required
+                placeholder="Password"
+              />
+            </div>
+
+            <button type="submit" class="auth-btn">LOGIN</button>
+          </form>
+
+          <div id="login-message" class="message"></div>
+
+          <p class="switch-text">
+            Don't have an account?
+            <a href="#" id="show-register">Create account</a>
+          </p>
+        </div>
+
+        <!-- Sign Up Card -->
+        <div class="auth-card hidden" id="register-section">
+          <h2>REGISTER</h2>
+
+          <form id="register-form">
+            <div class="input-group">
+              <input
+                type="email"
+                id="register-email"
+                name="email"
+                required
+                placeholder="E-mail"
+              />
+            </div>
+
+            <div class="input-group">
+              <input
+                type="password"
+                id="register-password"
+                name="password"
+                required
+                placeholder="Password"
+              />
+            </div>
+
+            <div class="input-group">
+              <input
+                type="password"
+                id="register-confirm-password"
+                name="confirmPassword"
+                required
+                placeholder="Confirm Password"
+              />
+            </div>
+
+            <!-- Consent checkboxes -->
+            <div class="consent-section">
+              <div class="checkbox-group">
+                <input
+                  type="checkbox"
+                  id="accept-tos"
+                  name="acceptTos"
+                  required
+                />
+                <label for="accept-tos">
+                  I accept the
+                  <a href="terms-of-service.html" target="_blank"
+                    >Terms of Service</a
+                  >
+                </label>
+              </div>
+
+              <div class="checkbox-group">
+                <input
+                  type="checkbox"
+                  id="accept-privacy"
+                  name="acceptPrivacy"
+                  required
+                />
+                <label for="accept-privacy">
+                  I accept the
+                  <a href="privacy-policy.html" target="_blank"
+                    >Privacy Policy</a
+                  >
+                </label>
+              </div>
+            </div>
+
+            <button type="submit" class="auth-btn">CREATE ACCOUNT</button>
+          </form>
+
+          <div id="register-message" class="message"></div>
+
+          <p class="switch-text">
+            Already have an account?
+            <a href="#" id="show-login">Login here</a>
+          </p>
+        </div>
+      </div>
+
+      <!-- User account section (shown after login) -->
+      <section id="user-section" class="auth-card user-card hidden">
+        <h2>MY ACCOUNT</h2>
+        <div id="user-info">
+          <p><strong>Email:</strong> <span id="display-email"></span></p>
+          <p><strong>Created:</strong> <span id="display-created"></span></p>
+        </div>
+
+        <button id="logout-btn" class="auth-btn logout-btn">LOGOUT</button>
+        <button id="delete-account-btn" class="auth-btn danger-btn">
+          DELETE MY ACCOUNT
+        </button>
+      </section>
+    </div>
+
+    <script src="index.mjs" type="module"></script>
   </body>
 </html>
