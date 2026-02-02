@@ -4,4 +4,4 @@ A Kanban board designed for students to manage tasks. It can be shared with othe
 
 Feature map: https://miro.com/app/live-embed/uXjVGQe8ojA=/?embedMode=view_only_without_ui&moveToViewport=-1777%2C-741%2C5897%2C1591&embedId=149657881517
 
-Project plan: https://miro.com/app/board/uXjVGN2NOYI=/?share_link_id=891668020840
+TRELLO PM: https://trello.com/invite/b/69810d39c9aa178b16e37ab6/ATTI4b8ac8845409de085458b31a788ae69e825324F0/pm-donesy-kanban-app
