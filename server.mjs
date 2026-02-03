@@ -1,6 +1,7 @@
 import express from "express";
 import fs from "fs";
 import errorHandler, { NotFoundError, ValidationError } from "./middleware.mjs";
+import { createUserRoutes } from "./routes/users.mjs";
 
 const app = express();
 const PORT = 8080;
@@ -23,6 +24,12 @@ function saveUsers() {
 const users = loadUsers();
 let nextUserId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
 
+const userRoutes = createUserRoutes({
+  users,
+  saveUsers,
+  getNextUserId: () => nextUserId++,
+});
+
 const boards = [
   {
     id: 1,
@@ -39,95 +46,7 @@ const boards = [
 ];
 let nextBoardId = 3;
 
-app.get("/users", (req, res) => {
-  res.json({ users });
-});
-
-app.get("/users/:id", (req, res, next) => {
-  const userId = parseInt(req.params.id);
-  const user = users.find((u) => u.id === userId);
-
-  if (!user) {
-    return next(new NotFoundError("User", userId));
-  }
-
-  res.json({ user });
-});
-
-app.post("/users", (req, res, next) => {
-  const { email, password, acceptedTos, acceptedPrivacy } = req.body;
-
-  if (!email || !password) {
-    return next(new ValidationError([], "Email and password are required"));
-  }
-
-  if (!acceptedTos || !acceptedPrivacy) {
-    return next(
-      new ValidationError(
-        [],
-        "You must accept Terms of Service and Privacy Policy",
-      ),
-    );
-  }
-
-  const existingUser = users.find((u) => u.email === email.toLowerCase());
-  if (existingUser) {
-    return next(new ValidationError([], "Email is already registered"));
-  }
-
-  const newUser = {
-    id: nextUserId++,
-    email: email.toLowerCase(),
-    password: password,
-    createdAt: new Date().toISOString(),
-  };
-  users.push(newUser);
-  saveUsers();
-
-  res.status(201).json({
-    user: {
-      id: newUser.id,
-      email: newUser.email,
-      createdAt: newUser.createdAt,
-    },
-  });
-});
-
-app.post("/users/login", (req, res, next) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return next(new ValidationError([], "Email and password are required"));
-  }
-
-  const user = users.find((u) => u.email === email.toLowerCase());
-
-  if (!user || user.password !== password) {
-    return next(new ValidationError([], "Invalid email or password"));
-  }
-
-  res.json({
-    user: {
-      id: user.id,
-      email: user.email,
-      createdAt: user.createdAt,
-    },
-  });
-});
-
-app.delete("/users/:id", (req, res, next) => {
-  const userId = parseInt(req.params.id);
-  const userIndex = users.findIndex((u) => u.id === userId);
-
-  if (userIndex === -1) {
-    return next(new NotFoundError("User", userId));
-  }
-
-  users.splice(userIndex, 1);
-  saveUsers();
-
-  res.status(204).send();
-});
+app.use("/users", userRoutes);
 
 app.get("/boards", (req, res) => {
   res.json({ boards });
