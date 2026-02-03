@@ -34,6 +34,11 @@ export async function loginUser(email, password) {
   return data.user;
 }
 
+export async function updateUser(userId, userData) {
+  const data = await apiRequest("/users/" + userId, "PUT", userData);
+  return data.user;
+}
+
 export async function deleteUser(userId) {
   return await apiRequest("/users/" + userId, "DELETE", null);
 }

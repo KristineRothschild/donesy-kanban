@@ -80,6 +80,40 @@ export function createUserRoutes({ users, saveUsers, getNextUserId }) {
     });
   });
 
+  router.put("/:id", (req, res, next) => {
+    const userId = parseInt(req.params.id);
+    const user = users.find((u) => u.id === userId);
+
+    if (!user) {
+      return next(new NotFoundError("User", userId));
+    }
+
+    const { email, password } = req.body;
+
+    if (email) {
+      const emailLower = email.toLowerCase();
+      const existingUser = users.find((u) => u.email === emailLower && u.id !== userId);
+      if (existingUser) {
+        return next(new ValidationError([], "Email is already registered"));
+      }
+      user.email = emailLower;
+    }
+
+    if (password) {
+      user.password = password;
+    }
+
+    saveUsers();
+
+    res.json({
+      user: {
+        id: user.id,
+        email: user.email,
+        createdAt: user.createdAt,
+      },
+    });
+  });
+
   router.delete("/:id", (req, res, next) => {
     const userId = parseInt(req.params.id);
     const userIndex = users.findIndex((u) => u.id === userId);
