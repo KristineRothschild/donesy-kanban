@@ -12,7 +12,19 @@ export function loadUsers() {
 
 export const users = loadUsers();
 
-let nextUserId = users.length > 0 ? Math.max(...users.map(u => u.id)) + 1 : 1;
+let nextUserId = 1;
+
+if (users.length > 0) {
+  let highestId = 0;
+
+  for (const user of users) {
+    if (user.id > highestId) {
+      highestId = user.id;
+    }
+  }
+
+  nextUserId = highestId + 1;
+}
 
 export function getNextUserId() {
   return nextUserId++;
