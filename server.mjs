@@ -1,9 +1,9 @@
 import express from "express";
 import errorHandler from "./middleware.mjs";
-import { createUserRoutes } from "./routes/users.mjs";
-import { createBoardRoutes } from "./routes/boards.mjs";
-import { users, saveUsers, getNextUserId } from "./data/users.mjs";
-import { boards, getNextBoardId } from "./data/boards.mjs";
+import { createUserRoutes } from "./routes/usersRoutes.mjs";
+import { createBoardRoutes } from "./routes/boardsRoutes.mjs";
+import { users, saveUsers, getNextUserId } from "./data/usersData.mjs";
+import { boards, getNextBoardId } from "./data/boardsData.mjs";
 
 const app = express();
 const PORT = 8080;

@@ -48,83 +48,7 @@
         </div>
 
         <!-- Sign Up Card -->
-        <div class="auth-card hidden" id="register-section">
-          <h2>REGISTER</h2>
-
-          <form id="register-form">
-            <div class="input-group">
-              <input
-                type="email"
-                id="register-email"
-                name="email"
-                required
-                placeholder="E-mail"
-              />
-            </div>
-
-            <div class="input-group">
-              <input
-                type="password"
-                id="register-password"
-                name="password"
-                required
-                placeholder="Password"
-              />
-            </div>
-
-            <div class="input-group">
-              <input
-                type="password"
-                id="register-confirm-password"
-                name="confirmPassword"
-                required
-                placeholder="Confirm Password"
-              />
-            </div>
-
-            <!-- Consent checkboxes -->
-            <div class="consent-section">
-              <div class="checkbox-group">
-                <input
-                  type="checkbox"
-                  id="accept-tos"
-                  name="acceptTos"
-                  required
-                />
-                <label for="accept-tos">
-                  I accept the
-                  <a href="terms-of-service.html" target="_blank"
-                    >Terms of Service</a
-                  >
-                </label>
-              </div>
-
-              <div class="checkbox-group">
-                <input
-                  type="checkbox"
-                  id="accept-privacy"
-                  name="acceptPrivacy"
-                  required
-                />
-                <label for="accept-privacy">
-                  I accept the
-                  <a href="privacy-policy.html" target="_blank"
-                    >Privacy Policy</a
-                  >
-                </label>
-              </div>
-            </div>
-
-            <button type="submit" class="auth-btn">CREATE ACCOUNT</button>
-          </form>
-
-          <div id="register-message" class="message"></div>
-
-          <p class="switch-text">
-            Already have an account?
-            <a href="#" id="show-login">Login here</a>
-          </p>
-        </div>
+        <user-create class="hidden" id="register-section"></user-create>
       </div>
 
       <!-- User account section (shown after login) -->
@@ -142,6 +66,7 @@
       </section>
     </div>
 
+    <script src="components/userCreate.mjs" type="module"></script>
     <script src="index.mjs" type="module"></script>
   </body>
 </html>

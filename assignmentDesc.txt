@@ -1,0 +1,22 @@
+Our goal for this assignment is to get started on the client in a structured way.
+To do this we are going to create some UI to interact with the user API that you started working on previously. 
+
+If you have not already done so; add a basic scaffold for a client to your public folder. 
+A basic scaffold would minimum contain files like:
+
+index.html
+app.mjs
+app.css
+Once this is done, it is time to start expanding the client according to some rules
+
+Only use relative URL´s
+The client should only have a single fetch call.
+Do not duplicate data object structures.
+Make some basic architecture decisions, minimum separate UI, Logic and Data.
+You are done with this assignment when:
+
+Your client has a custom web component for creating users / deleting users / editing users.
+Your app has the ability to create users through API calls using your client.
+Notes:
+
+Notice that this assignment has ample room for you to make large choices for your application.Consider the MVC pattern and the observer pattern when building your client architecture, but realise that these are not the only type of patterns. This assignment does have ramifications for the architecture of your full application, so do put thought and energy into the design. 
