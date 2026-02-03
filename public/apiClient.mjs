@@ -1,48 +1,39 @@
-export async function createUser(userData) {
-  const response = await fetch("/users", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(userData),
-  });
+async function apiRequest(url, method, body) {
+  const options = {
+    method: method,
+    headers: {},
+  };
+
+  if (body) {
+    options.headers["Content-Type"] = "application/json";
+    options.body = JSON.stringify(body);
+  }
+
+  const response = await fetch(url, options);
+
+  if (method === "DELETE" && response.ok) {
+    return true;
+  }
 
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.error?.message || "Could not create user");
+    throw new Error(data.error?.message || "Request failed");
   }
 
+  return data;
+}
+
+export async function createUser(userData) {
+  const data = await apiRequest("/users", "POST", userData);
   return data.user;
 }
 
 export async function loginUser(email, password) {
-  const response = await fetch("/users/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password }),
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.error?.message || "Could not login");
-  }
-
+  const data = await apiRequest("/users/login", "POST", { email, password });
   return data.user;
 }
 
 export async function deleteUser(userId) {
-  const response = await fetch("/users/" + userId, {
-    method: "DELETE",
-  });
-
-  if (!response.ok) {
-    const data = await response.json();
-    throw new Error(data.error?.message || "Could not delete user");
-  }
-
-  return true;
+  return await apiRequest("/users/" + userId, "DELETE", null);
 }
