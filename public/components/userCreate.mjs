@@ -13,6 +13,10 @@ class UserCreate extends HTMLElement {
 
         <form id="register-form">
           <div class="input-group">
+            <input type="text" id="register-name" name="name" required placeholder="Name" />
+          </div>
+
+          <div class="input-group">
             <input type="email" id="register-email" name="email" required placeholder="E-mail" />
           </div>
 
@@ -78,6 +82,7 @@ class UserCreate extends HTMLElement {
 
     try {
       const user = await createUser({
+        name: this.querySelector("#register-name").value,
         email: this.querySelector("#register-email").value,
         password: password,
         acceptedTos: this.querySelector("#accept-tos").checked,

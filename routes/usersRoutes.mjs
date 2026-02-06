@@ -20,10 +20,10 @@ export function createUserRoutes({ users, saveUsers, getNextUserId }) {
   });
 
   router.post("/", (req, res, next) => {
-    const { email, password, acceptedTos, acceptedPrivacy } = req.body;
+    const { name, email, password, acceptedTos, acceptedPrivacy } = req.body;
 
-    if (!email || !password) {
-      return next(new ValidationError([], "Email and password are required"));
+    if (!name || !email || !password) {
+      return next(new ValidationError([], "Name, email and password are required"));
     }
 
     if (!acceptedTos || !acceptedPrivacy) {
@@ -42,6 +42,7 @@ export function createUserRoutes({ users, saveUsers, getNextUserId }) {
 
     const newUser = {
       id: getNextUserId(),
+      name: name,
       email: email.toLowerCase(),
       password: password,
       createdAt: new Date().toISOString(),
@@ -52,6 +53,7 @@ export function createUserRoutes({ users, saveUsers, getNextUserId }) {
     res.status(201).json({
       user: {
         id: newUser.id,
+        name: newUser.name,
         email: newUser.email,
         createdAt: newUser.createdAt,
       },
@@ -74,6 +76,7 @@ export function createUserRoutes({ users, saveUsers, getNextUserId }) {
     res.json({
       user: {
         id: user.id,
+        name: user.name,
         email: user.email,
         createdAt: user.createdAt,
       },
@@ -88,19 +91,10 @@ export function createUserRoutes({ users, saveUsers, getNextUserId }) {
       return next(new NotFoundError("User", userId));
     }
 
-    const { email, password } = req.body;
+    const { name } = req.body;
 
-    if (email) {
-      const emailLower = email.toLowerCase();
-      const existingUser = users.find((u) => u.email === emailLower && u.id !== userId);
-      if (existingUser) {
-        return next(new ValidationError([], "Email is already registered"));
-      }
-      user.email = emailLower;
-    }
-
-    if (password) {
-      user.password = password;
+    if (name) {
+      user.name = name;
     }
 
     saveUsers();
@@ -108,6 +102,7 @@ export function createUserRoutes({ users, saveUsers, getNextUserId }) {
     res.json({
       user: {
         id: user.id,
+        name: user.name,
         email: user.email,
         createdAt: user.createdAt,
       },
