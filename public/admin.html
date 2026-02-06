@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Donesy Kanban - My Account</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="app-title">Donesy Kanban</h1>
+
+      <div class="admin-wrapper">
+        <div class="auth-card user-card">
+          <h2>MY ACCOUNT</h2>
+          <div id="user-info">
+            <p><strong>Name:</strong> <span id="display-name"></span></p>
+            <p><strong>Email:</strong> <span id="display-email"></span></p>
+            <p><strong>Created:</strong> <span id="display-created"></span></p>
+          </div>
+          <button id="logout-btn" class="auth-btn logout-btn">LOGOUT</button>
+        </div>
+
+        <user-edit id="edit-section"></user-edit>
+
+        <user-delete id="delete-section"></user-delete>
+      </div>
+    </div>
+
+    <script src="components/userEdit.mjs" type="module"></script>
+    <script src="components/userDelete.mjs" type="module"></script>
+    <script src="admin.mjs" type="module"></script>
+  </body>
+</html>
