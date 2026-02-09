@@ -60,9 +60,11 @@ async function handleLogin(event) {
   }
 }
 
-export function init() {
+function init() {
   showRegisterLink.addEventListener("click", handleShowRegister);
   registerSection.addEventListener("show-login", handleShowLogin);
   registerSection.addEventListener("user-created", handleUserCreated);
   loginForm.addEventListener("submit", handleLogin);
 }
+
+init();

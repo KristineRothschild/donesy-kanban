@@ -1,8 +1,4 @@
-const currentUser = JSON.parse(sessionStorage.getItem("currentUser"));
-
-if (!currentUser) {
-  window.location.href = "/";
-}
+import { getUser, setUser, clearUser, isLoggedIn } from "../models/userModel.mjs";
 
 const displayName = document.getElementById("display-name");
 const displayEmail = document.getElementById("display-email");
@@ -18,21 +14,35 @@ function showUserInfo(user) {
   deleteSection.setAttribute("user-id", user.id);
 }
 
-showUserInfo(currentUser);
-
-logoutBtn.addEventListener("click", function () {
-  sessionStorage.removeItem("currentUser");
+function handleLogout() {
+  clearUser();
   window.location.href = "/";
-});
+}
 
-editSection.addEventListener("user-updated", function (event) {
+function handleUserUpdated(event) {
   const updatedUser = event.detail.user;
-  sessionStorage.setItem("currentUser", JSON.stringify(updatedUser));
+  setUser(updatedUser);
   showUserInfo(updatedUser);
-});
+}
 
-deleteSection.addEventListener("user-deleted", function () {
-  sessionStorage.removeItem("currentUser");
+function handleUserDeleted() {
+  clearUser();
   alert("Your account has been deleted. Thank you for using Donesy Kanban.");
   window.location.href = "/";
-});
+}
+
+function init() {
+  if (!isLoggedIn()) {
+    window.location.href = "/";
+    return;
+  }
+
+  const user = getUser();
+  showUserInfo(user);
+
+  logoutBtn.addEventListener("click", handleLogout);
+  editSection.addEventListener("user-updated", handleUserUpdated);
+  deleteSection.addEventListener("user-deleted", handleUserDeleted);
+}
+
+init();
