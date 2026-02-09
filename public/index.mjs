@@ -1,4 +1,4 @@
-import { loginUser } from "./apiClient.mjs";
+import { loginUser } from "./services/apiClient.mjs";
 
 const loginSection = document.getElementById("login-section");
 const registerSection = document.getElementById("register-section");

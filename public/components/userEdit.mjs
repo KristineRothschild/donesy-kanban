@@ -1,4 +1,4 @@
-import { updateUser } from "../apiClient.mjs";
+import { updateUser } from "../services/apiClient.mjs";
 
 class UserEdit extends HTMLElement {
   connectedCallback() {

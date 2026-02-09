@@ -1,4 +1,4 @@
-import { deleteUser } from "../apiClient.mjs";
+import { deleteUser } from "../services/apiClient.mjs";
 
 class UserDelete extends HTMLElement {
   connectedCallback() {
