@@ -8,15 +8,9 @@ class UserDelete extends HTMLElement {
 
   render() {
     this.innerHTML = `
-      <div class="auth-card">
-        <h2>DELETE ACCOUNT</h2>
-
-        <p class="delete-warning">Deleting your account cannot be undone.</p>
-
-        <button id="delete-btn" class="auth-btn danger-btn">DELETE MY ACCOUNT</button>
-
-        <div id="delete-message" class="message"></div>
-      </div>
+      <p class="delete-warning">Deleting your account cannot be undone.</p>
+      <button id="delete-btn" class="auth-btn danger-btn">DELETE MY ACCOUNT</button>
+      <div id="delete-message" class="message"></div>
     `;
   }
 
@@ -33,9 +27,7 @@ class UserDelete extends HTMLElement {
       return;
     }
 
-    const confirmed = confirm(
-      "Are you sure you want to delete your account?\n\nThis cannot be undone.",
-    );
+    const confirmed = confirm("Are you sure you want to delete your account?\n\nThis cannot be undone.");
 
     if (!confirmed) {
       return;
@@ -46,12 +38,10 @@ class UserDelete extends HTMLElement {
 
       this.showMessage("Account deleted", "success");
 
-      this.dispatchEvent(
-        new CustomEvent("user-deleted", {
-          detail: { userId: userId },
-          bubbles: true,
-        }),
-      );
+      this.dispatchEvent(new CustomEvent("user-deleted", {
+        detail: { userId: userId },
+        bubbles: true,
+      }));
     } catch (error) {
       this.showMessage(error.message, "error");
     }

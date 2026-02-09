@@ -45,7 +45,6 @@ export function createUserRoutes({ users, saveUsers, getNextUserId }) {
       name: name,
       email: email.toLowerCase(),
       password: password,
-      createdAt: new Date().toISOString(),
     };
     users.push(newUser);
     saveUsers();
@@ -55,7 +54,6 @@ export function createUserRoutes({ users, saveUsers, getNextUserId }) {
         id: newUser.id,
         name: newUser.name,
         email: newUser.email,
-        createdAt: newUser.createdAt,
       },
     });
   });
@@ -78,7 +76,6 @@ export function createUserRoutes({ users, saveUsers, getNextUserId }) {
         id: user.id,
         name: user.name,
         email: user.email,
-        createdAt: user.createdAt,
       },
     });
   });
@@ -104,7 +101,6 @@ export function createUserRoutes({ users, saveUsers, getNextUserId }) {
         id: user.id,
         name: user.name,
         email: user.email,
-        createdAt: user.createdAt,
       },
     });
   });

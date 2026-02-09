@@ -6,7 +6,6 @@ if (!currentUser) {
 
 const displayName = document.getElementById("display-name");
 const displayEmail = document.getElementById("display-email");
-const displayCreated = document.getElementById("display-created");
 const logoutBtn = document.getElementById("logout-btn");
 const editSection = document.getElementById("edit-section");
 const deleteSection = document.getElementById("delete-section");
@@ -14,7 +13,6 @@ const deleteSection = document.getElementById("delete-section");
 function showUserInfo(user) {
   displayName.textContent = user.name || "Not set";
   displayEmail.textContent = user.email;
-  displayCreated.textContent = new Date(user.createdAt).toLocaleDateString("en-US");
 
   editSection.setAttribute("user-id", user.id);
   deleteSection.setAttribute("user-id", user.id);
