@@ -1,6 +1,14 @@
 import { Router } from "express";
 import { NotFoundError, ValidationError } from "../middleware.mjs";
 
+function toUserResponse(user) {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+  };
+}
+
 export function createUserRoutes({ users, saveUsers, getNextUserId }) {
   const router = Router();
 
@@ -23,15 +31,17 @@ export function createUserRoutes({ users, saveUsers, getNextUserId }) {
     const { name, email, password, acceptedTos, acceptedPrivacy } = req.body;
 
     if (!name || !email || !password) {
-      return next(new ValidationError([], "Name, email and password are required"));
+      return next(
+        new ValidationError([], "Name, email and password are required")
+      );
     }
 
     if (!acceptedTos || !acceptedPrivacy) {
       return next(
         new ValidationError(
           [],
-          "You must accept Terms of Service and Privacy Policy",
-        ),
+          "You must accept Terms of Service and Privacy Policy"
+        )
       );
     }
 
@@ -49,13 +59,7 @@ export function createUserRoutes({ users, saveUsers, getNextUserId }) {
     users.push(newUser);
     saveUsers();
 
-    res.status(201).json({
-      user: {
-        id: newUser.id,
-        name: newUser.name,
-        email: newUser.email,
-      },
-    });
+    res.status(201).json({ user: toUserResponse(newUser) });
   });
 
   router.post("/login", (req, res, next) => {
@@ -71,13 +75,7 @@ export function createUserRoutes({ users, saveUsers, getNextUserId }) {
       return next(new ValidationError([], "Invalid email or password"));
     }
 
-    res.json({
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-      },
-    });
+    res.json({ user: toUserResponse(user) });
   });
 
   router.put("/:id", (req, res, next) => {
@@ -96,13 +94,7 @@ export function createUserRoutes({ users, saveUsers, getNextUserId }) {
 
     saveUsers();
 
-    res.json({
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-      },
-    });
+    res.json({ user: toUserResponse(user) });
   });
 
   router.delete("/:id", (req, res, next) => {
