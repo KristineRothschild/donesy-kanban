@@ -1,114 +1,56 @@
 import { Router } from "express";
-import { NotFoundError, ValidationError } from "../middleware.mjs";
 
-function toUserResponse(user) {
-  return {
-    id: user.id,
-    name: user.name,
-    email: user.email,
-  };
-}
-
-export function createUserRoutes({ users, saveUsers, getNextUserId }) {
+export function createUserRoutes({ usersService }) {
   const router = Router();
 
   router.get("/", (req, res) => {
+    const users = usersService.getAllUsers();
     res.json({ users });
   });
 
   router.get("/:id", (req, res, next) => {
-    const userId = parseInt(req.params.id);
-    const user = users.find((u) => u.id === userId);
-
-    if (!user) {
-      return next(new NotFoundError("User", userId));
+    try {
+      const user = usersService.getUserById(parseInt(req.params.id));
+      res.json({ user });
+    } catch (error) {
+      next(error);
     }
-
-    res.json({ user });
   });
 
   router.post("/", (req, res, next) => {
-    const { name, email, password, acceptedTos, acceptedPrivacy } = req.body;
-
-    if (!name || !email || !password) {
-      return next(
-        new ValidationError([], "Name, email and password are required")
-      );
+    try {
+      const user = usersService.createUser(req.body);
+      res.status(201).json({ user });
+    } catch (error) {
+      next(error);
     }
-
-    if (!acceptedTos || !acceptedPrivacy) {
-      return next(
-        new ValidationError(
-          [],
-          "You must accept Terms of Service and Privacy Policy"
-        )
-      );
-    }
-
-    const existingUser = users.find((u) => u.email === email.toLowerCase());
-    if (existingUser) {
-      return next(new ValidationError([], "Email is already registered"));
-    }
-
-    const newUser = {
-      id: getNextUserId(),
-      name: name,
-      email: email.toLowerCase(),
-      password: password,
-    };
-    users.push(newUser);
-    saveUsers();
-
-    res.status(201).json({ user: toUserResponse(newUser) });
   });
 
   router.post("/login", (req, res, next) => {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return next(new ValidationError([], "Email and password are required"));
+    try {
+      const user = usersService.loginUser(req.body.email, req.body.password);
+      res.json({ user });
+    } catch (error) {
+      next(error);
     }
-
-    const user = users.find((u) => u.email === email.toLowerCase());
-
-    if (!user || user.password !== password) {
-      return next(new ValidationError([], "Invalid email or password"));
-    }
-
-    res.json({ user: toUserResponse(user) });
   });
 
   router.put("/:id", (req, res, next) => {
-    const userId = parseInt(req.params.id);
-    const user = users.find((u) => u.id === userId);
-
-    if (!user) {
-      return next(new NotFoundError("User", userId));
+    try {
+      const user = usersService.updateUser(parseInt(req.params.id), req.body);
+      res.json({ user });
+    } catch (error) {
+      next(error);
     }
-
-    const { name } = req.body;
-
-    if (name) {
-      user.name = name;
-    }
-
-    saveUsers();
-
-    res.json({ user: toUserResponse(user) });
   });
 
   router.delete("/:id", (req, res, next) => {
-    const userId = parseInt(req.params.id);
-    const userIndex = users.findIndex((u) => u.id === userId);
-
-    if (userIndex === -1) {
-      return next(new NotFoundError("User", userId));
+    try {
+      usersService.deleteUser(parseInt(req.params.id));
+      res.status(204).send();
+    } catch (error) {
+      next(error);
     }
-
-    users.splice(userIndex, 1);
-    saveUsers();
-
-    res.status(204).send();
   });
 
   return router;
