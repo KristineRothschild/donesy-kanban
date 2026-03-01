@@ -8,7 +8,7 @@ import { users, saveUsers, getNextUserId } from "./data/usersData.mjs";
 import { boards, getNextBoardId } from "./data/boardsData.mjs";
 
 const app = express();
-const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
 

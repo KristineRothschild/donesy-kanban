@@ -1,6 +1,8 @@
 {
   "scripts": {
-    "dev": "nodemon server.mjs"
+    "dev": "nodemon server.mjs",
+    "build": "npm install",
+    "start": "node server.mjs"
   },
   "dependencies": {
     "express": "^5.2.1"
