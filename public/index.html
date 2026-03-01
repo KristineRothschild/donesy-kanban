@@ -10,7 +10,8 @@
     <div class="container">
       <h1 class="app-title">Donesy Kanban</h1>
 
-      <div class="auth-wrapper">
+      <!-- Login view -->
+      <div id="login-view" class="auth-wrapper">
         <div class="auth-card" id="login-section">
           <h2>LOGIN</h2>
 
@@ -48,9 +49,39 @@
 
         <user-create class="hidden" id="register-section"></user-create>
       </div>
+
+      <!-- Account view -->
+      <div id="account-view" class="auth-wrapper hidden">
+        <div class="auth-card user-card">
+          <h2>MY ACCOUNT</h2>
+
+          <div class="profile-table">
+            <div class="profile-row">
+              <span class="profile-label">Name</span>
+              <span class="profile-value" id="display-name"></span>
+            </div>
+            <div class="profile-row">
+              <span class="profile-label">Email</span>
+              <span class="profile-value" id="display-email"></span>
+            </div>
+          </div>
+
+          <user-edit id="edit-section"></user-edit>
+
+          <hr class="divider" />
+
+          <user-delete id="delete-section"></user-delete>
+
+          <hr class="divider" />
+
+          <button id="logout-btn" class="auth-btn logout-btn">LOGOUT</button>
+        </div>
+      </div>
     </div>
 
     <script src="components/userCreate.mjs" type="module"></script>
-    <script src="controllers/indexController.mjs" type="module"></script>
+    <script src="components/userEdit.mjs" type="module"></script>
+    <script src="components/userDelete.mjs" type="module"></script>
+    <script src="controllers/appController.mjs" type="module"></script>
   </body>
 </html>
