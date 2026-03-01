@@ -33,3 +33,21 @@ https://trello.com/invite/b/69810d39c9aa178b16e37ab6/ATTI4b8ac8845409de085458b31
 ### Testing
 
 The API is tested with HTTPie. The exported test setup can be found in `httpie-space-donesy-kanban.json`.
+
+## Live Service URL
+
+https://donesy-kanban.onrender.com
+
+## PostgreSQL Setup (Users + Boards)
+
+This project now stores users and boards in PostgreSQL with raw SQL using `pg`.
+
+1. Run migration:
+   - `npm run migrate`
+2. Start server:
+   - `npm run dev` or `npm start`
+
+Migration files are in `db/migrations`:
+
+- `001_create_users_table.sql`
+- `002_create_boards_table.sql`
