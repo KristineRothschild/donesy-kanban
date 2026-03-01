@@ -8,22 +8,33 @@ function toUserResponse(user) {
   };
 }
 
-export function createUsersService({ users, saveUsers, getNextUserId }) {
-  function getAllUsers() {
-    return users;
+export function createUsersService({ db }) {
+  async function getAllUsers() {
+    const result = await db.query(
+      "SELECT id, name, email FROM users ORDER BY id ASC",
+    );
+    return result.rows;
   }
 
-  function getUserById(id) {
-    const user = users.find((u) => u.id === id);
-
+  async function getUserById(id) {
+    const result = await db.query(
+      "SELECT id, name, email FROM users WHERE id = $1",
+      [id],
+    );
+    const user = result.rows[0];
     if (!user) {
       throw new NotFoundError("User", id);
     }
-
-    return toUserResponse(user);
+    return user;
   }
 
-  function createUser({ name, email, password, acceptedTos, acceptedPrivacy }) {
+  async function createUser({
+    name,
+    email,
+    password,
+    acceptedTos,
+    acceptedPrivacy,
+  }) {
     if (!name || !email || !password) {
       throw new ValidationError([], "Name, email and password are required");
     }
@@ -35,30 +46,32 @@ export function createUsersService({ users, saveUsers, getNextUserId }) {
       );
     }
 
-    const existingUser = users.find((u) => u.email === email.toLowerCase());
-    if (existingUser) {
-      throw new ValidationError([], "Email is already registered");
+    try {
+      const result = await db.query(
+        `INSERT INTO users (name, email, password, accepted_tos, accepted_privacy)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING id, name, email`,
+        [name, email.toLowerCase(), password, acceptedTos, acceptedPrivacy],
+      );
+      return result.rows[0];
+    } catch (error) {
+      if (error.code === "23505") {
+        throw new ValidationError([], "Email is already registered");
+      }
+      throw error;
     }
-
-    const newUser = {
-      id: getNextUserId(),
-      name: name,
-      email: email.toLowerCase(),
-      password: password,
-    };
-    users.push(newUser);
-    saveUsers();
-
-    return toUserResponse(newUser);
   }
 
-  function loginUser(email, password) {
+  async function loginUser(email, password) {
     if (!email || !password) {
       throw new ValidationError([], "Email and password are required");
     }
 
-    const user = users.find((u) => u.email === email.toLowerCase());
-
+    const result = await db.query(
+      "SELECT id, name, email, password FROM users WHERE email = $1",
+      [email.toLowerCase()],
+    );
+    const user = result.rows[0];
     if (!user || user.password !== password) {
       throw new ValidationError([], "Invalid email or password");
     }
@@ -66,31 +79,28 @@ export function createUsersService({ users, saveUsers, getNextUserId }) {
     return toUserResponse(user);
   }
 
-  function updateUser(id, { name }) {
-    const user = users.find((u) => u.id === id);
-
+  async function updateUser(id, { name }) {
+    const currentUser = await getUserById(id);
+    const updatedName = name || currentUser.name;
+    const result = await db.query(
+      `UPDATE users
+       SET name = $1, updated_at = NOW()
+       WHERE id = $2
+       RETURNING id, name, email`,
+      [updatedName, id],
+    );
+    const user = result.rows[0];
     if (!user) {
       throw new NotFoundError("User", id);
     }
-
-    if (name) {
-      user.name = name;
-    }
-
-    saveUsers();
-
-    return toUserResponse(user);
+    return user;
   }
 
-  function deleteUser(id) {
-    const userIndex = users.findIndex((u) => u.id === id);
-
-    if (userIndex === -1) {
+  async function deleteUser(id) {
+    const result = await db.query("DELETE FROM users WHERE id = $1", [id]);
+    if (result.rowCount === 0) {
       throw new NotFoundError("User", id);
     }
-
-    users.splice(userIndex, 1);
-    saveUsers();
   }
 
   return {
