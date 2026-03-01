@@ -4,24 +4,16 @@ import { createUserRoutes } from "./routes/usersRoutes.mjs";
 import { createBoardRoutes } from "./routes/boardsRoutes.mjs";
 import { createUsersService } from "./services/usersService.mjs";
 import { createBoardsService } from "./services/boardsService.mjs";
-import { users, saveUsers, getNextUserId } from "./data/usersData.mjs";
-import { boards, getNextBoardId } from "./data/boardsData.mjs";
+import db from "./db/db.mjs";
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
 
-const usersService = createUsersService({
-  users,
-  saveUsers,
-  getNextUserId,
-});
+const usersService = createUsersService({ db });
 
-const boardsService = createBoardsService({
-  boards,
-  getNextBoardId,
-});
+const boardsService = createBoardsService({ db });
 
 const userRoutes = createUserRoutes({ usersService });
 const boardRoutes = createBoardRoutes({ boardsService });

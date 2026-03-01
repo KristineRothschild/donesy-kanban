@@ -1,21 +1,41 @@
 import { NotFoundError, ValidationError } from "../middleware.mjs";
 
-export function createBoardsService({ boards, getNextBoardId }) {
-  function getAllBoards() {
-    return boards;
+function toBoardResponse(board) {
+  return {
+    id: board.id,
+    name: board.name,
+    description: board.description,
+    createdAt: board.created_at,
+    updatedAt: board.updated_at,
+  };
+}
+
+export function createBoardsService({ db }) {
+  async function getAllBoards() {
+    const result = await db.query(
+      `SELECT id, name, description, created_at, updated_at
+       FROM boards
+       ORDER BY id ASC`,
+    );
+    return result.rows.map(toBoardResponse);
   }
 
-  function getBoardById(id) {
-    const board = boards.find((b) => b.id === id);
-
+  async function getBoardById(id) {
+    const result = await db.query(
+      `SELECT id, name, description, created_at, updated_at
+       FROM boards
+       WHERE id = $1`,
+      [id],
+    );
+    const board = result.rows[0];
     if (!board) {
       throw new NotFoundError("Board", id);
     }
 
-    return board;
+    return toBoardResponse(board);
   }
 
-  function createBoard({ name, description }) {
+  async function createBoard({ name, description }) {
     const errors = [];
     if (!name || typeof name !== "string" || name.trim() === "") {
       errors.push({
@@ -28,24 +48,16 @@ export function createBoardsService({ boards, getNextBoardId }) {
       throw new ValidationError(errors);
     }
 
-    const newBoard = {
-      id: getNextBoardId(),
-      name: name.trim(),
-      description: description?.trim() || null,
-      createdAt: new Date().toISOString(),
-    };
-    boards.push(newBoard);
-
-    return newBoard;
+    const result = await db.query(
+      `INSERT INTO boards (name, description)
+       VALUES ($1, $2)
+       RETURNING id, name, description, created_at, updated_at`,
+      [name.trim(), description?.trim() || null],
+    );
+    return toBoardResponse(result.rows[0]);
   }
 
-  function updateBoard(id, { name, description }) {
-    const boardIndex = boards.findIndex((b) => b.id === id);
-
-    if (boardIndex === -1) {
-      throw new NotFoundError("Board", id);
-    }
-
+  async function updateBoard(id, { name, description }) {
     const errors = [];
     if (name !== undefined && (typeof name !== "string" || name.trim() === "")) {
       errors.push({ field: "name", message: "Name cannot be empty" });
@@ -55,26 +67,40 @@ export function createBoardsService({ boards, getNextBoardId }) {
       throw new ValidationError(errors);
     }
 
-    const currentBoard = boards[boardIndex];
-    const updatedBoard = {
-      ...currentBoard,
-      name: name?.trim() || currentBoard.name,
-      description: description?.trim() || currentBoard.description,
-      updatedAt: new Date().toISOString(),
-    };
-    boards[boardIndex] = updatedBoard;
-
-    return updatedBoard;
-  }
-
-  function deleteBoard(id) {
-    const boardIndex = boards.findIndex((b) => b.id === id);
-
-    if (boardIndex === -1) {
+    const existingBoardResult = await db.query(
+      "SELECT id, name, description FROM boards WHERE id = $1",
+      [id],
+    );
+    const currentBoard = existingBoardResult.rows[0];
+    if (!currentBoard) {
       throw new NotFoundError("Board", id);
     }
 
-    boards.splice(boardIndex, 1);
+    const result = await db.query(
+      `UPDATE boards
+       SET
+         name = $1,
+         description = $2,
+         updated_at = NOW()
+       WHERE id = $3
+       RETURNING id, name, description, created_at, updated_at`,
+      [
+        name?.trim() || currentBoard.name,
+        description !== undefined
+          ? (description?.trim() || null)
+          : currentBoard.description,
+        id,
+      ],
+    );
+
+    return toBoardResponse(result.rows[0]);
+  }
+
+  async function deleteBoard(id) {
+    const result = await db.query("DELETE FROM boards WHERE id = $1", [id]);
+    if (result.rowCount === 0) {
+      throw new NotFoundError("Board", id);
+    }
   }
 
   return {
