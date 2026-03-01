@@ -1,17 +1,14 @@
 import { deleteUser } from "../services/apiClient.mjs";
 
 class UserDelete extends HTMLElement {
-  connectedCallback() {
-    this.render();
+  async connectedCallback() {
+    await this.render();
     this.setupEventListeners();
   }
 
-  render() {
-    this.innerHTML = `
-      <p class="delete-warning">Deleting your account cannot be undone.</p>
-      <button id="delete-btn" class="auth-btn danger-btn">DELETE MY ACCOUNT</button>
-      <div id="delete-message" class="message"></div>
-    `;
+  async render() {
+    const response = await fetch("/templates/userDelete.html");
+    this.innerHTML = await response.text();
   }
 
   setupEventListeners() {

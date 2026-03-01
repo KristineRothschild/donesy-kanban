@@ -1,30 +1,15 @@
 import { updateUser } from "../services/apiClient.mjs";
 
 class UserEdit extends HTMLElement {
-  connectedCallback() {
+  async connectedCallback() {
     this.isEditing = false;
-    this.render();
+    await this.render();
     this.setupEventListeners();
   }
 
-  render() {
-    this.innerHTML = `
-      <div id="edit-view">
-        <button id="edit-btn" class="auth-btn edit-btn">Edit</button>
-      </div>
-      <div id="edit-form-view" class="hidden">
-        <form id="edit-form">
-          <div class="input-group">
-            <input type="text" id="edit-name" name="name" placeholder="New name" required />
-          </div>
-          <div class="edit-buttons">
-            <button type="submit" class="auth-btn small-btn">Save</button>
-            <button type="button" id="cancel-btn" class="auth-btn small-btn cancel-btn">Cancel</button>
-          </div>
-        </form>
-        <div id="edit-message" class="message"></div>
-      </div>
-    `;
+  async render() {
+    const response = await fetch("/templates/userEdit.html");
+    this.innerHTML = await response.text();
   }
 
   setupEventListeners() {

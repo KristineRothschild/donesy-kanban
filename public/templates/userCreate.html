@@ -1,0 +1,46 @@
+<div class="auth-card">
+  <h2>REGISTER</h2>
+
+  <form id="register-form">
+    <div class="input-group">
+      <input type="text" id="register-name" name="name" required placeholder="Name" />
+    </div>
+
+    <div class="input-group">
+      <input type="email" id="register-email" name="email" required placeholder="E-mail" />
+    </div>
+
+    <div class="input-group">
+      <input type="password" id="register-password" name="password" required placeholder="Password" />
+    </div>
+
+    <div class="input-group">
+      <input type="password" id="register-confirm-password" name="confirmPassword" required placeholder="Confirm Password" />
+    </div>
+
+    <div class="consent-section">
+      <div class="checkbox-group">
+        <input type="checkbox" id="accept-tos" name="acceptTos" required />
+        <label for="accept-tos">
+          I accept the <a href="terms-of-service.html" target="_blank">Terms of Service</a>
+        </label>
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="accept-privacy" name="acceptPrivacy" required />
+        <label for="accept-privacy">
+          I accept the <a href="privacy-policy.html" target="_blank">Privacy Policy</a>
+        </label>
+      </div>
+    </div>
+
+    <button type="submit" class="auth-btn">CREATE ACCOUNT</button>
+  </form>
+
+  <div id="register-message" class="message"></div>
+
+  <p class="switch-text">
+    Already have an account?
+    <a href="#" id="show-login">Login here</a>
+  </p>
+</div>
