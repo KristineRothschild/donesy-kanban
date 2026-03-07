@@ -113,6 +113,11 @@ function handleNavigation(viewName) {
     return;
   }
 
+  if (viewName === "login" && isLoggedIn()) {
+    navigateTo("account");
+    return;
+  }
+
   if (viewName === "account" && isLoggedIn()) {
     showUserInfo(getUser());
   }
