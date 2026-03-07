@@ -1,0 +1,16 @@
+{
+  "Name, email and password are required": "Name, email and password are required",
+  "You must accept Terms of Service and Privacy Policy": "You must accept Terms of Service and Privacy Policy",
+  "Email is already registered": "Email is already registered",
+  "Email and password are required": "Email and password are required",
+  "Invalid email or password": "Invalid email or password",
+  "Name is required and must be a non-empty string": "Name is required and must be a non-empty string",
+  "Name cannot be empty": "Name cannot be empty",
+  "Invalid request body": "Invalid request body",
+  "Internal server error": "Internal server error",
+  "not_found": "{resource} not found",
+  "not_found_with_id": "{resource} with id '{id}' not found",
+  "User": "User",
+  "Board": "Board",
+  "Resource": "Resource"
+}

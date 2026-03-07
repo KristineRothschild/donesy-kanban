@@ -1,9 +1,12 @@
 import { updateUser } from "../services/apiClient.mjs";
+import { ready, t, translatePage } from "../services/i18n.mjs";
 
 class UserEdit extends HTMLElement {
   async connectedCallback() {
     this.isEditing = false;
+    await ready;
     await this.render();
+    translatePage(this);
     this.setupEventListeners();
   }
 
@@ -40,14 +43,14 @@ class UserEdit extends HTMLElement {
     const name = this.querySelector("#edit-name").value;
 
     if (!userId) {
-      this.showMessage("No user selected", "error");
+      this.showMessage(t("edit.no_user"), "error");
       return;
     }
 
     try {
       const user = await updateUser(userId, { name: name });
 
-      this.showMessage("Name updated!", "success");
+      this.showMessage(t("edit.success"), "success");
       this.querySelector("#edit-form").reset();
 
       setTimeout(() => {

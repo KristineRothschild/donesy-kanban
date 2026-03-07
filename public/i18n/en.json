@@ -1,0 +1,42 @@
+{
+  "login.title": "LOGIN",
+  "login.email": "E-mail",
+  "login.password": "Password",
+  "login.button": "LOGIN",
+  "login.no_account": "Don't have an account?",
+  "login.create_account": "Create account",
+  "login.success": "Login successful!",
+
+  "register.title": "REGISTER",
+  "register.name": "Name",
+  "register.email": "E-mail",
+  "register.password": "Password",
+  "register.confirm_password": "Confirm Password",
+  "register.tos_label": "I accept the <a href=\"terms-of-service.html\" target=\"_blank\">Terms of Service</a>",
+  "register.privacy_label": "I accept the <a href=\"privacy-policy.html\" target=\"_blank\">Privacy Policy</a>",
+  "register.button": "CREATE ACCOUNT",
+  "register.has_account": "Already have an account?",
+  "register.login_here": "Login here",
+  "register.passwords_mismatch": "Passwords do not match",
+  "register.success": "Account created!",
+
+  "account.title": "MY ACCOUNT",
+  "account.name": "Name",
+  "account.email": "Email",
+  "account.logout": "LOGOUT",
+  "account.not_set": "Not set",
+  "account.deleted": "Your account has been deleted. Thank you for using Donesy Kanban.",
+
+  "edit.button": "Edit",
+  "edit.placeholder": "New name",
+  "edit.save": "Save",
+  "edit.cancel": "Cancel",
+  "edit.success": "Name updated!",
+  "edit.no_user": "No user selected",
+
+  "delete.warning": "Deleting your account cannot be undone.",
+  "delete.button": "DELETE MY ACCOUNT",
+  "delete.confirm": "Are you sure you want to delete your account?\n\nThis cannot be undone.",
+  "delete.success": "Account deleted",
+  "delete.no_user": "No user selected"
+}

@@ -1,8 +1,11 @@
 import { deleteUser } from "../services/apiClient.mjs";
+import { ready, t, translatePage } from "../services/i18n.mjs";
 
 class UserDelete extends HTMLElement {
   async connectedCallback() {
+    await ready;
     await this.render();
+    translatePage(this);
     this.setupEventListeners();
   }
 
@@ -20,11 +23,11 @@ class UserDelete extends HTMLElement {
     const userId = this.getAttribute("user-id");
 
     if (!userId) {
-      this.showMessage("No user selected", "error");
+      this.showMessage(t("delete.no_user"), "error");
       return;
     }
 
-    const confirmed = confirm("Are you sure you want to delete your account?\n\nThis cannot be undone.");
+    const confirmed = confirm(t("delete.confirm"));
 
     if (!confirmed) {
       return;
@@ -33,7 +36,7 @@ class UserDelete extends HTMLElement {
     try {
       await deleteUser(userId);
 
-      this.showMessage("Account deleted", "success");
+      this.showMessage(t("delete.success"), "success");
 
       this.dispatchEvent(new CustomEvent("user-deleted", {
         detail: { userId: userId },

@@ -1,8 +1,11 @@
 import { createUser } from "../services/apiClient.mjs";
+import { ready, t, translatePage } from "../services/i18n.mjs";
 
 class UserCreate extends HTMLElement {
   async connectedCallback() {
+    await ready;
     await this.render();
+    translatePage(this);
     this.setupEventListeners();
   }
 
@@ -30,7 +33,7 @@ class UserCreate extends HTMLElement {
     const confirmPassword = this.querySelector("#register-confirm-password").value;
 
     if (password !== confirmPassword) {
-      this.showMessage("Passwords do not match", "error");
+      this.showMessage(t("register.passwords_mismatch"), "error");
       return;
     }
 
@@ -43,7 +46,7 @@ class UserCreate extends HTMLElement {
         acceptedPrivacy: this.querySelector("#accept-privacy").checked,
       });
 
-      this.showMessage("Account created!", "success");
+      this.showMessage(t("register.success"), "success");
       this.querySelector("#register-form").reset();
 
       this.dispatchEvent(new CustomEvent("user-created", {

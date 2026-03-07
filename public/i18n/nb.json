@@ -1,0 +1,42 @@
+{
+  "login.title": "LOGG INN",
+  "login.email": "E-post",
+  "login.password": "Passord",
+  "login.button": "LOGG INN",
+  "login.no_account": "Har du ikke en konto?",
+  "login.create_account": "Opprett konto",
+  "login.success": "Innlogging vellykket!",
+
+  "register.title": "REGISTRER",
+  "register.name": "Navn",
+  "register.email": "E-post",
+  "register.password": "Passord",
+  "register.confirm_password": "Bekreft passord",
+  "register.tos_label": "Jeg godtar <a href=\"terms-of-service.html\" target=\"_blank\">vilkårene</a>",
+  "register.privacy_label": "Jeg godtar <a href=\"privacy-policy.html\" target=\"_blank\">personvernerklæringen</a>",
+  "register.button": "OPPRETT KONTO",
+  "register.has_account": "Har du allerede en konto?",
+  "register.login_here": "Logg inn her",
+  "register.passwords_mismatch": "Passordene samsvarer ikke",
+  "register.success": "Konto opprettet!",
+
+  "account.title": "MIN KONTO",
+  "account.name": "Navn",
+  "account.email": "E-post",
+  "account.logout": "LOGG UT",
+  "account.not_set": "Ikke angitt",
+  "account.deleted": "Kontoen din er slettet. Takk for at du brukte Donesy Kanban.",
+
+  "edit.button": "Rediger",
+  "edit.placeholder": "Nytt navn",
+  "edit.save": "Lagre",
+  "edit.cancel": "Avbryt",
+  "edit.success": "Navn oppdatert!",
+  "edit.no_user": "Ingen bruker valgt",
+
+  "delete.warning": "Sletting av kontoen din kan ikke angres.",
+  "delete.button": "SLETT MIN KONTO",
+  "delete.confirm": "Er du sikker på at du vil slette kontoen din?\n\nDette kan ikke angres.",
+  "delete.success": "Konto slettet",
+  "delete.no_user": "Ingen bruker valgt"
+}

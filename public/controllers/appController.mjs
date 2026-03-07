@@ -1,6 +1,7 @@
 import { loginUser } from "../services/apiClient.mjs";
 import { getUser, setUser, clearUser, isLoggedIn } from "../models/userModel.mjs";
 import { registerView, navigateTo, onNavigate } from "../services/router.mjs";
+import { ready, t, translatePage } from "../services/i18n.mjs";
 
 const loginView = document.getElementById("login-view");
 const accountView = document.getElementById("account-view");
@@ -41,7 +42,7 @@ function showRegisterSection() {
 }
 
 function showUserInfo(user) {
-  displayName.textContent = user.name || "Not set";
+  displayName.textContent = user.name || t("account.not_set");
   displayEmail.textContent = user.email;
 
   editSection.setAttribute("user-id", user.id);
@@ -76,7 +77,7 @@ async function handleLogin(event) {
 
   try {
     const user = await loginUser(email, password);
-    showMessage(loginMessage, "Login successful!", "success");
+    showMessage(loginMessage, t("login.success"), "success");
 
     setTimeout(function () {
       goToAccount(user);
@@ -102,7 +103,7 @@ function handleUserUpdated(event) {
 
 function handleUserDeleted() {
   clearUser();
-  alert("Your account has been deleted. Thank you for using Donesy Kanban.");
+  alert(t("account.deleted"));
   navigateTo("login");
 }
 
@@ -117,7 +118,10 @@ function handleNavigation(viewName) {
   }
 }
 
-function init() {
+async function init() {
+  await ready;
+  translatePage();
+
   showRegisterLink.addEventListener("click", handleShowRegister);
   registerSection.addEventListener("show-login", handleShowLogin);
   registerSection.addEventListener("user-created", handleUserCreated);

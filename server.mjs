@@ -1,5 +1,6 @@
 import express from "express";
 import errorHandler from "./middleware.mjs";
+import { getLanguage } from "./locales/i18n.mjs";
 import { createUserRoutes } from "./routes/usersRoutes.mjs";
 import { createBoardRoutes } from "./routes/boardsRoutes.mjs";
 import { createUsersService } from "./services/usersService.mjs";
@@ -10,6 +11,11 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 app.use(express.json());
+
+app.use((req, res, next) => {
+  req.lang = getLanguage(req.headers["accept-language"]);
+  next();
+});
 
 const usersService = createUsersService({ db });
 

@@ -10,10 +10,9 @@
     <div class="container">
       <h1 class="app-title">Donesy Kanban</h1>
 
-      <!-- Login view -->
       <div id="login-view" class="auth-wrapper">
         <div class="auth-card" id="login-section">
-          <h2>LOGIN</h2>
+          <h2 data-i18n="login.title">LOGIN</h2>
 
           <form id="login-form">
             <div class="input-group">
@@ -23,6 +22,7 @@
                 name="email"
                 required
                 placeholder="E-mail"
+                data-i18n-placeholder="login.email"
               />
             </div>
 
@@ -33,35 +33,35 @@
                 name="password"
                 required
                 placeholder="Password"
+                data-i18n-placeholder="login.password"
               />
             </div>
 
-            <button type="submit" class="auth-btn">LOGIN</button>
+            <button type="submit" class="auth-btn" data-i18n="login.button">LOGIN</button>
           </form>
 
           <div id="login-message" class="message"></div>
 
           <p class="switch-text">
-            Don't have an account?
-            <a href="#" id="show-register">Create account</a>
+            <span data-i18n="login.no_account">Don't have an account?</span>
+            <a href="#" id="show-register" data-i18n="login.create_account">Create account</a>
           </p>
         </div>
 
         <user-create class="hidden" id="register-section"></user-create>
       </div>
 
-      <!-- Account view -->
       <div id="account-view" class="auth-wrapper hidden">
         <div class="auth-card user-card">
-          <h2>MY ACCOUNT</h2>
+          <h2 data-i18n="account.title">MY ACCOUNT</h2>
 
           <div class="profile-table">
             <div class="profile-row">
-              <span class="profile-label">Name</span>
+              <span class="profile-label" data-i18n="account.name">Name</span>
               <span class="profile-value" id="display-name"></span>
             </div>
             <div class="profile-row">
-              <span class="profile-label">Email</span>
+              <span class="profile-label" data-i18n="account.email">Email</span>
               <span class="profile-value" id="display-email"></span>
             </div>
           </div>
@@ -74,7 +74,7 @@
 
           <hr class="divider" />
 
-          <button id="logout-btn" class="auth-btn logout-btn">LOGOUT</button>
+          <button id="logout-btn" class="auth-btn logout-btn" data-i18n="account.logout">LOGOUT</button>
         </div>
       </div>
     </div>

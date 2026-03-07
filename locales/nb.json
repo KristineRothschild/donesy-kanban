@@ -1,0 +1,16 @@
+{
+  "Name, email and password are required": "Navn, e-post og passord er påkrevd",
+  "You must accept Terms of Service and Privacy Policy": "Du må godta vilkårene og personvernerklæringen",
+  "Email is already registered": "E-posten er allerede registrert",
+  "Email and password are required": "E-post og passord er påkrevd",
+  "Invalid email or password": "Ugyldig e-post eller passord",
+  "Name is required and must be a non-empty string": "Navn er påkrevd og kan ikke være tomt",
+  "Name cannot be empty": "Navn kan ikke være tomt",
+  "Invalid request body": "Ugyldig forespørsel",
+  "Internal server error": "Intern serverfeil",
+  "not_found": "{resource} ble ikke funnet",
+  "not_found_with_id": "{resource} med id '{id}' ble ikke funnet",
+  "User": "Bruker",
+  "Board": "Tavle",
+  "Resource": "Ressurs"
+}
