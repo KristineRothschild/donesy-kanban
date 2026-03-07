@@ -3,7 +3,8 @@
     "dev": "nodemon server.mjs",
     "build": "npm install",
     "start": "node server.mjs",
-    "migrate": "node scripts/migrate.mjs"
+    "migrate": "node scripts/migrate.mjs",
+    "db:nuke": "node scripts/nuke-db.mjs && npm run migrate"
   },
   "dependencies": {
     "express": "^5.2.1",
