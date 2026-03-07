@@ -1,46 +1,46 @@
 <div class="auth-card">
-  <h2>REGISTER</h2>
+  <h2 data-i18n="register.title">REGISTER</h2>
 
   <form id="register-form">
     <div class="input-group">
-      <input type="text" id="register-name" name="name" required placeholder="Name" />
+      <input type="text" id="register-name" name="name" required placeholder="Name" data-i18n-placeholder="register.name" />
     </div>
 
     <div class="input-group">
-      <input type="email" id="register-email" name="email" required placeholder="E-mail" />
+      <input type="email" id="register-email" name="email" required placeholder="E-mail" data-i18n-placeholder="register.email" />
     </div>
 
     <div class="input-group">
-      <input type="password" id="register-password" name="password" required placeholder="Password" />
+      <input type="password" id="register-password" name="password" required placeholder="Password" data-i18n-placeholder="register.password" />
     </div>
 
     <div class="input-group">
-      <input type="password" id="register-confirm-password" name="confirmPassword" required placeholder="Confirm Password" />
+      <input type="password" id="register-confirm-password" name="confirmPassword" required placeholder="Confirm Password" data-i18n-placeholder="register.confirm_password" />
     </div>
 
     <div class="consent-section">
       <div class="checkbox-group">
         <input type="checkbox" id="accept-tos" name="acceptTos" required />
-        <label for="accept-tos">
+        <label for="accept-tos" data-i18n-html="register.tos_label">
           I accept the <a href="terms-of-service.html" target="_blank">Terms of Service</a>
         </label>
       </div>
 
       <div class="checkbox-group">
         <input type="checkbox" id="accept-privacy" name="acceptPrivacy" required />
-        <label for="accept-privacy">
+        <label for="accept-privacy" data-i18n-html="register.privacy_label">
           I accept the <a href="privacy-policy.html" target="_blank">Privacy Policy</a>
         </label>
       </div>
     </div>
 
-    <button type="submit" class="auth-btn">CREATE ACCOUNT</button>
+    <button type="submit" class="auth-btn" data-i18n="register.button">CREATE ACCOUNT</button>
   </form>
 
   <div id="register-message" class="message"></div>
 
   <p class="switch-text">
-    Already have an account?
-    <a href="#" id="show-login">Login here</a>
+    <span data-i18n="register.has_account">Already have an account?</span>
+    <a href="#" id="show-login" data-i18n="register.login_here">Login here</a>
   </p>
 </div>
