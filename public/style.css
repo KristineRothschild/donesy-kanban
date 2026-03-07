@@ -14,6 +14,36 @@ body {
   padding: 20px;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #2d5a7b;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  z-index: 100;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.skip-link:focus {
+  top: 10px;
+}
+
 .container {
   width: 100%;
   max-width: 900px;
@@ -24,7 +54,7 @@ body {
   color: white;
   font-size: 2.5rem;
   margin-bottom: 30px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .auth-wrapper {
@@ -45,7 +75,7 @@ body {
 
 .auth-card h2 {
   text-align: center;
-  color: #4a7ba7;
+  color: #2d5a7b;
   font-size: 1.5rem;
   margin-bottom: 25px;
   letter-spacing: 2px;
@@ -62,16 +92,16 @@ body {
   border-radius: 5px;
   font-size: 1rem;
   background-color: white;
-  color: #5b9bd5;
+  color: #333;
 }
 
 .input-group input::placeholder {
-  color: #5b9bd5;
-  opacity: 0.8;
+  color: #6b8dad;
 }
 
 .input-group input:focus {
-  outline: 2px solid #4a7ba7;
+  outline: 3px solid #2d5a7b;
+  outline-offset: 2px;
 }
 
 .auth-btn {
@@ -91,6 +121,11 @@ body {
 
 .auth-btn:hover {
   background-color: #3d6a91;
+}
+
+.auth-btn:focus-visible {
+  outline: 3px solid #2d5a7b;
+  outline-offset: 2px;
 }
 
 .logout-btn {
@@ -127,13 +162,18 @@ body {
   cursor: pointer;
 }
 
+.checkbox-group input[type="checkbox"]:focus-visible {
+  outline: 3px solid #2d5a7b;
+  outline-offset: 2px;
+}
+
 .checkbox-group label {
-  color: #4a7ba7;
+  color: #2d5a7b;
   font-size: 0.9rem;
 }
 
 .checkbox-group a {
-  color: #2d5a7b;
+  color: #1a3d5c;
   text-decoration: underline;
 }
 
@@ -160,18 +200,23 @@ body {
 .switch-text {
   text-align: center;
   margin-top: 20px;
-  color: #4a7ba7;
+  color: #2d5a7b;
   font-size: 0.9rem;
 }
 
 .switch-text a {
-  color: #2d5a7b;
+  color: #1a3d5c;
   text-decoration: none;
   font-weight: bold;
 }
 
 .switch-text a:hover {
   text-decoration: underline;
+}
+
+.switch-text a:focus-visible {
+  outline: 3px solid #2d5a7b;
+  outline-offset: 2px;
 }
 
 .user-card {
@@ -188,7 +233,7 @@ body {
 
 #user-info p {
   margin: 10px 0;
-  color: #4a7ba7;
+  color: #2d5a7b;
 }
 
 .profile-table {
@@ -207,12 +252,12 @@ body {
 
 .profile-label {
   font-weight: bold;
-  color: #4a7ba7;
+  color: #2d5a7b;
   width: 100px;
 }
 
 .profile-value {
-  color: #5b9bd5;
+  color: #2d5a7b;
 }
 
 .edit-btn {
@@ -244,60 +289,7 @@ body {
 }
 
 main {
-  background-color: #a4c8e8;
-  border-radius: 10px;
-  padding: 40px 30px;
-  max-width: 600px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-main h1 {
-  color: #4a7ba7;
-  margin-bottom: 20px;
-}
-
-main h2 {
-  color: #4a7ba7;
-  margin-top: 25px;
-  margin-bottom: 10px;
-}
-
-main p, main li {
-  color: #333;
-  margin-bottom: 10px;
-}
-
-main ul {
-  margin-left: 20px;
-  margin-bottom: 15px;
-}
-
-main a {
-  color: #2d5a7b;
-}
-
-.close-btn {
-  display: block;
-  margin: 30px auto 0;
-  padding: 12px 30px;
-  background-color: #4a7ba7;
-  color: white;
-  border: none;
-  border-radius: 25px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.close-btn:hover {
-  background-color: #3d6a91;
-}
-
-.admin-wrapper {
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-  flex-wrap: wrap;
+  background-color: transparent;
 }
 
 .delete-warning {
@@ -323,7 +315,7 @@ main a {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .auth-card {
     max-width: 100%;
   }

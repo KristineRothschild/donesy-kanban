@@ -1,15 +1,37 @@
 <div id="edit-view">
-  <button id="edit-btn" class="auth-btn edit-btn" data-i18n="edit.button">Edit</button>
+  <button id="edit-btn" class="auth-btn edit-btn" data-i18n="edit.button">
+    Edit
+  </button>
 </div>
 <div id="edit-form-view" class="hidden">
   <form id="edit-form">
     <div class="input-group">
-      <input type="text" id="edit-name" name="name" placeholder="New name" required data-i18n-placeholder="edit.placeholder" />
+      <label for="edit-name" class="sr-only" data-i18n="edit.placeholder"
+        >New name</label
+      >
+      <input
+        type="text"
+        id="edit-name"
+        name="name"
+        placeholder="New name"
+        required
+        data-i18n-placeholder="edit.placeholder"
+        autocomplete="name"
+      />
     </div>
     <div class="edit-buttons">
-      <button type="submit" class="auth-btn small-btn" data-i18n="edit.save">Save</button>
-      <button type="button" id="cancel-btn" class="auth-btn small-btn cancel-btn" data-i18n="edit.cancel">Cancel</button>
+      <button type="submit" class="auth-btn small-btn" data-i18n="edit.save">
+        Save
+      </button>
+      <button
+        type="button"
+        id="cancel-btn"
+        class="auth-btn small-btn cancel-btn"
+        data-i18n="edit.cancel"
+      >
+        Cancel
+      </button>
     </div>
   </form>
-  <div id="edit-message" class="message"></div>
+  <div id="edit-message" class="message" role="status" aria-live="polite"></div>
 </div>

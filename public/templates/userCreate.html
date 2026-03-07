@@ -3,41 +3,105 @@
 
   <form id="register-form">
     <div class="input-group">
-      <input type="text" id="register-name" name="name" required placeholder="Name" data-i18n-placeholder="register.name" />
+      <label for="register-name" class="sr-only" data-i18n="register.name"
+        >Name</label
+      >
+      <input
+        type="text"
+        id="register-name"
+        name="name"
+        required
+        placeholder="Name"
+        data-i18n-placeholder="register.name"
+        autocomplete="name"
+      />
     </div>
 
     <div class="input-group">
-      <input type="email" id="register-email" name="email" required placeholder="E-mail" data-i18n-placeholder="register.email" />
+      <label for="register-email" class="sr-only" data-i18n="register.email"
+        >E-mail</label
+      >
+      <input
+        type="email"
+        id="register-email"
+        name="email"
+        required
+        placeholder="E-mail"
+        data-i18n-placeholder="register.email"
+        autocomplete="email"
+      />
     </div>
 
     <div class="input-group">
-      <input type="password" id="register-password" name="password" required placeholder="Password" data-i18n-placeholder="register.password" />
+      <label
+        for="register-password"
+        class="sr-only"
+        data-i18n="register.password"
+        >Password</label
+      >
+      <input
+        type="password"
+        id="register-password"
+        name="password"
+        required
+        placeholder="Password"
+        data-i18n-placeholder="register.password"
+        autocomplete="new-password"
+      />
     </div>
 
     <div class="input-group">
-      <input type="password" id="register-confirm-password" name="confirmPassword" required placeholder="Confirm Password" data-i18n-placeholder="register.confirm_password" />
+      <label
+        for="register-confirm-password"
+        class="sr-only"
+        data-i18n="register.confirm_password"
+        >Confirm Password</label
+      >
+      <input
+        type="password"
+        id="register-confirm-password"
+        name="confirmPassword"
+        required
+        placeholder="Confirm Password"
+        data-i18n-placeholder="register.confirm_password"
+        autocomplete="new-password"
+      />
     </div>
 
     <div class="consent-section">
       <div class="checkbox-group">
         <input type="checkbox" id="accept-tos" name="acceptTos" required />
         <label for="accept-tos" data-i18n-html="register.tos_label">
-          I accept the <a href="terms-of-service.html" target="_blank">Terms of Service</a>
+          I accept the
+          <a href="terms-of-service.html" target="_blank">Terms of Service</a>
         </label>
       </div>
 
       <div class="checkbox-group">
-        <input type="checkbox" id="accept-privacy" name="acceptPrivacy" required />
+        <input
+          type="checkbox"
+          id="accept-privacy"
+          name="acceptPrivacy"
+          required
+        />
         <label for="accept-privacy" data-i18n-html="register.privacy_label">
-          I accept the <a href="privacy-policy.html" target="_blank">Privacy Policy</a>
+          I accept the
+          <a href="privacy-policy.html" target="_blank">Privacy Policy</a>
         </label>
       </div>
     </div>
 
-    <button type="submit" class="auth-btn" data-i18n="register.button">CREATE ACCOUNT</button>
+    <button type="submit" class="auth-btn" data-i18n="register.button">
+      CREATE ACCOUNT
+    </button>
   </form>
 
-  <div id="register-message" class="message"></div>
+  <div
+    id="register-message"
+    class="message"
+    role="status"
+    aria-live="polite"
+  ></div>
 
   <p class="switch-text">
     <span data-i18n="register.has_account">Already have an account?</span>

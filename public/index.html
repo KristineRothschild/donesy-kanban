@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -11,77 +11,109 @@
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
   </head>
   <body>
-    <div class="container">
-      <h1 class="app-title">Donesy Kanban</h1>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
 
-      <div id="login-view" class="auth-wrapper">
-        <div class="auth-card" id="login-section">
-          <h2 data-i18n="login.title">LOGIN</h2>
+    <main id="main-content">
+      <div class="container">
+        <h1 class="app-title">Donesy Kanban</h1>
 
-          <form id="login-form">
-            <div class="input-group">
-              <input
-                type="email"
-                id="login-email"
-                name="email"
-                required
-                placeholder="E-mail"
-                data-i18n-placeholder="login.email"
-              />
-            </div>
+        <div id="login-view" class="auth-wrapper">
+          <div class="auth-card" id="login-section">
+            <h2 data-i18n="login.title">LOGIN</h2>
 
-            <div class="input-group">
-              <input
-                type="password"
-                id="login-password"
-                name="password"
-                required
-                placeholder="Password"
-                data-i18n-placeholder="login.password"
-              />
-            </div>
+            <form id="login-form">
+              <div class="input-group">
+                <label for="login-email" class="sr-only" data-i18n="login.email"
+                  >E-mail</label
+                >
+                <input
+                  type="email"
+                  id="login-email"
+                  name="email"
+                  required
+                  placeholder="E-mail"
+                  data-i18n-placeholder="login.email"
+                  autocomplete="email"
+                />
+              </div>
 
-            <button type="submit" class="auth-btn" data-i18n="login.button">LOGIN</button>
-          </form>
+              <div class="input-group">
+                <label
+                  for="login-password"
+                  class="sr-only"
+                  data-i18n="login.password"
+                  >Password</label
+                >
+                <input
+                  type="password"
+                  id="login-password"
+                  name="password"
+                  required
+                  placeholder="Password"
+                  data-i18n-placeholder="login.password"
+                  autocomplete="current-password"
+                />
+              </div>
 
-          <div id="login-message" class="message"></div>
+              <button type="submit" class="auth-btn" data-i18n="login.button">
+                LOGIN
+              </button>
+            </form>
 
-          <p class="switch-text">
-            <span data-i18n="login.no_account">Don't have an account?</span>
-            <a href="#" id="show-register" data-i18n="login.create_account">Create account</a>
-          </p>
-        </div>
+            <div
+              id="login-message"
+              class="message"
+              role="status"
+              aria-live="polite"
+            ></div>
 
-        <user-create class="hidden" id="register-section"></user-create>
-      </div>
-
-      <div id="account-view" class="auth-wrapper hidden">
-        <div class="auth-card user-card">
-          <h2 data-i18n="account.title">MY ACCOUNT</h2>
-
-          <div class="profile-table">
-            <div class="profile-row">
-              <span class="profile-label" data-i18n="account.name">Name</span>
-              <span class="profile-value" id="display-name"></span>
-            </div>
-            <div class="profile-row">
-              <span class="profile-label" data-i18n="account.email">Email</span>
-              <span class="profile-value" id="display-email"></span>
-            </div>
+            <p class="switch-text">
+              <span data-i18n="login.no_account">Don't have an account?</span>
+              <a href="#" id="show-register" data-i18n="login.create_account"
+                >Create account</a
+              >
+            </p>
           </div>
 
-          <user-edit id="edit-section"></user-edit>
+          <user-create class="hidden" id="register-section"></user-create>
+        </div>
 
-          <hr class="divider" />
+        <div id="account-view" class="auth-wrapper hidden">
+          <div class="auth-card user-card">
+            <h2 data-i18n="account.title">MY ACCOUNT</h2>
 
-          <user-delete id="delete-section"></user-delete>
+            <div class="profile-table">
+              <div class="profile-row">
+                <span class="profile-label" data-i18n="account.name">Name</span>
+                <span class="profile-value" id="display-name"></span>
+              </div>
+              <div class="profile-row">
+                <span class="profile-label" data-i18n="account.email"
+                  >Email</span
+                >
+                <span class="profile-value" id="display-email"></span>
+              </div>
+            </div>
 
-          <hr class="divider" />
+            <user-edit id="edit-section"></user-edit>
 
-          <button id="logout-btn" class="auth-btn logout-btn" data-i18n="account.logout">LOGOUT</button>
+            <hr class="divider" />
+
+            <user-delete id="delete-section"></user-delete>
+
+            <hr class="divider" />
+
+            <button
+              id="logout-btn"
+              class="auth-btn logout-btn"
+              data-i18n="account.logout"
+            >
+              LOGOUT
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </main>
 
     <script src="components/userCreate.mjs" type="module"></script>
     <script src="components/userEdit.mjs" type="module"></script>
