@@ -10,6 +10,12 @@ class ApiError extends Error {
   }
 }
 
+class UnauthorizedError extends ApiError {
+  constructor(message = "You must be logged in") {
+    super(message, { status: 401, code: "UNAUTHORIZED" });
+  }
+}
+
 class ForbiddenError extends ApiError {
   constructor(
     message = "You shall not pass! The board is protected by the One User with the highest IQ.",
@@ -67,5 +73,5 @@ const errorHandler = (err, req, res, next) => {
   res.status(status).json(payload);
 };
 
-export { ApiError, ForbiddenError, ValidationError, NotFoundError };
+export { ApiError, UnauthorizedError, ForbiddenError, ValidationError, NotFoundError };
 export default errorHandler;
