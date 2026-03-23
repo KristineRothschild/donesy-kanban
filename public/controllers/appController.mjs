@@ -1,5 +1,9 @@
-import { loginUser } from "../services/apiClient.mjs";
-import { getUser, setUser, clearUser, isLoggedIn } from "../models/userModel.mjs";
+import {
+  fetchCurrentUser,
+  loginUser,
+  logoutUser,
+} from "../services/apiClient.mjs";
+import { getUser, setUser, clearUser } from "../models/userModel.mjs";
 import { registerView, navigateTo, onNavigate } from "../services/router.mjs";
 import { ready, t, translatePage } from "../services/i18n.mjs";
 
@@ -59,10 +63,25 @@ function handleShowLogin() {
   showLoginSection();
 }
 
-function goToAccount(user) {
+function setAuthenticatedUser(user) {
   setUser(user);
   showUserInfo(user);
+}
+
+function goToAccount(user) {
+  hideMessage(loginMessage);
+  setAuthenticatedUser(user);
   navigateTo("account");
+}
+
+function goToLogin({ resetForm = false } = {}) {
+  clearUser();
+  hideMessage(loginMessage);
+  showLoginSection();
+  if (resetForm) {
+    loginForm.reset();
+  }
+  navigateTo("login");
 }
 
 function handleUserCreated(event) {
@@ -77,49 +96,47 @@ async function handleLogin(event) {
 
   try {
     const user = await loginUser(email, password);
-    showMessage(loginMessage, t("login.success"), "success");
-
-    setTimeout(function () {
-      goToAccount(user);
-    }, 1000);
+    goToAccount(user);
   } catch (error) {
     showMessage(loginMessage, error.message, "error");
   }
 }
 
-function handleLogout() {
-  clearUser();
-  loginForm.reset();
-  hideMessage(loginMessage);
-  showLoginSection();
-  navigateTo("login");
+async function handleLogout() {
+  try {
+    await logoutUser();
+    goToLogin({ resetForm: true });
+  } catch (error) {
+    console.error(error);
+    alert(error.message);
+  }
 }
 
 function handleUserUpdated(event) {
   const updatedUser = event.detail.user;
-  setUser(updatedUser);
-  showUserInfo(updatedUser);
+  setAuthenticatedUser(updatedUser);
 }
 
 function handleUserDeleted() {
-  clearUser();
+  goToLogin({ resetForm: true });
   alert(t("account.deleted"));
-  navigateTo("login");
 }
 
 function handleNavigation(viewName) {
-  if (viewName === "account" && !isLoggedIn()) {
+  const currentUser = getUser();
+
+  if (viewName === "account" && !currentUser) {
     navigateTo("login");
     return;
   }
 
-  if (viewName === "login" && isLoggedIn()) {
+  if (viewName === "login" && currentUser) {
     navigateTo("account");
     return;
   }
 
-  if (viewName === "account" && isLoggedIn()) {
-    showUserInfo(getUser());
+  if (viewName === "account") {
+    showUserInfo(currentUser);
   }
 }
 
@@ -136,10 +153,15 @@ async function init() {
   editSection.addEventListener("user-updated", handleUserUpdated);
   deleteSection.addEventListener("user-deleted", handleUserDeleted);
 
-  if (isLoggedIn()) {
-    navigateTo("account");
-  } else {
-    navigateTo("login");
+  try {
+    const user = await fetchCurrentUser();
+    if (user) {
+      goToAccount(user);
+    } else {
+      goToLogin();
+    }
+  } catch (error) {
+    goToLogin();
   }
 
   onNavigate(handleNavigation);
