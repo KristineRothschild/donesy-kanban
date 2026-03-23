@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS tasks (
+  id SERIAL PRIMARY KEY,
+  board_id INTEGER NOT NULL REFERENCES boards (id) ON DELETE CASCADE,
+  column_id INTEGER NOT NULL REFERENCES board_columns (id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  description TEXT,
+  due_date DATE,
+  assignee_user_id INTEGER REFERENCES users (id) ON DELETE SET NULL,
+  position INTEGER NOT NULL DEFAULT 0,
+  review_requested BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
