@@ -5,6 +5,7 @@ import {
   fetchBoardColumns,
   fetchBoardTasks,
   createBoard,
+  deleteBoard,
   createBoardInvite,
   createTask,
   acceptBoardInvite,
@@ -38,6 +39,7 @@ const displayEmail = document.getElementById("display-email");
 const openAccountBtn = document.getElementById("open-account-btn");
 const boardAccountBtn = document.getElementById("board-account-btn");
 const boardBackBtn = document.getElementById("board-back-btn");
+const deleteBoardBtn = document.getElementById("delete-board-btn");
 const backToBoardsBtn = document.getElementById("back-to-boards-btn");
 const logoutBtn = document.getElementById("logout-btn");
 const editSection = document.getElementById("edit-section");
@@ -67,6 +69,8 @@ const boardDetailVisibility = document.getElementById("board-detail-visibility")
 const boardColumns = document.getElementById("board-columns");
 
 let pendingInviteToken = new URLSearchParams(window.location.search).get("invite");
+let pendingBoardsMessage = null;
+let pendingBoardDetailMessage = null;
 let boardListState = [];
 let selectedBoardId = null;
 let currentBoardState = null;
@@ -74,6 +78,8 @@ let currentBoardColumnsState = [];
 let currentBoardTasksState = [];
 let activeCreateColumnId = null;
 let editingTaskId = null;
+let draggedTaskId = null;
+let activeDropColumnId = null;
 
 function showMessage(element, text, type) {
   element.textContent = text;
@@ -155,6 +161,53 @@ function canShareCurrentBoard() {
   return currentBoardState?.role === "owner";
 }
 
+function canDeleteCurrentBoard() {
+  return currentBoardState?.role === "owner";
+}
+
+function canRequestReview() {
+  return currentBoardState?.visibility === "shared";
+}
+
+function clearDragState() {
+  draggedTaskId = null;
+  activeDropColumnId = null;
+  boardColumns.querySelectorAll(".task-item-dragging").forEach((element) => {
+    element.classList.remove("task-item-dragging");
+  });
+  boardColumns.querySelectorAll(".column-card-drag-over").forEach((element) => {
+    element.classList.remove("column-card-drag-over");
+  });
+}
+
+function highlightDropColumn(columnId) {
+  if (activeDropColumnId === columnId) {
+    return;
+  }
+
+  activeDropColumnId = columnId;
+  boardColumns.querySelectorAll(".column-card").forEach((element) => {
+    const isActive = Number.parseInt(element.dataset.columnId, 10) === columnId;
+    element.classList.toggle("column-card-drag-over", isActive);
+  });
+}
+
+function moveTaskInState(taskId, columnId) {
+  currentBoardTasksState = currentBoardTasksState.map((task) =>
+    task.id === taskId ? { ...task, columnId } : task,
+  );
+}
+
+function updateBoardState(boardId, updates) {
+  boardListState = boardListState.map((board) =>
+    board.id === boardId ? { ...board, ...updates } : board,
+  );
+
+  if (currentBoardState?.id === boardId) {
+    currentBoardState = { ...currentBoardState, ...updates };
+  }
+}
+
 function setBoardFormVisibility(isVisible) {
   createBoardForm.classList.toggle("hidden", !isVisible);
   toggleBoardFormBtn.classList.toggle("hidden", isVisible);
@@ -231,7 +284,8 @@ function getTaskFormValues(form) {
   const title = form.querySelector('[name="title"]').value.trim();
   const description = form.querySelector('[name="description"]').value.trim();
   const dueDate = form.querySelector('[name="dueDate"]').value;
-  const reviewRequested = form.querySelector('[name="reviewRequested"]').checked;
+  const reviewRequestedInput = form.querySelector('[name="reviewRequested"]');
+  const reviewRequested = reviewRequestedInput ? reviewRequestedInput.checked : false;
 
   return {
     title,
@@ -260,6 +314,7 @@ function clearBoardsView() {
   hideMessage(boardMessage);
   hideMessage(boardDetailMessage);
   toggleSharePanelBtn.classList.add("hidden");
+  deleteBoardBtn.classList.add("hidden");
 }
 
 function buildTaskEditForm(task) {
@@ -316,22 +371,25 @@ function buildTaskEditForm(task) {
   dueDateGroup.appendChild(dueDateLabel);
   dueDateGroup.appendChild(dueDateInput);
 
-  const reviewLabel = document.createElement("label");
-  reviewLabel.className = "checkbox-group task-review-checkbox";
-  const reviewInput = document.createElement("input");
-  reviewInput.type = "checkbox";
-  reviewInput.name = "reviewRequested";
-  reviewInput.checked = task.reviewRequested;
-  const reviewText = document.createElement("span");
-  reviewText.textContent = t("tasks.review_requested_label");
-  reviewLabel.appendChild(reviewInput);
-  reviewLabel.appendChild(reviewText);
-
   grid.appendChild(titleGroup);
   grid.appendChild(columnGroup);
   grid.appendChild(descriptionGroup);
   grid.appendChild(dueDateGroup);
-  grid.appendChild(reviewLabel);
+
+  if (canRequestReview()) {
+    const reviewLabel = document.createElement("label");
+    reviewLabel.className = "checkbox-group task-review-checkbox";
+    const reviewInput = document.createElement("input");
+    reviewInput.type = "checkbox";
+    reviewInput.name = "reviewRequested";
+    reviewInput.checked = task.reviewRequested;
+    const reviewText = document.createElement("span");
+    reviewText.textContent = t("tasks.review_requested_label");
+    reviewLabel.appendChild(reviewInput);
+    reviewLabel.appendChild(reviewText);
+    grid.appendChild(reviewLabel);
+  }
+
   form.appendChild(grid);
 
   const actions = document.createElement("div");
@@ -398,20 +456,23 @@ function buildTaskCreateForm(column) {
   dueDateGroup.appendChild(dueDateLabel);
   dueDateGroup.appendChild(dueDateInput);
 
-  const reviewLabel = document.createElement("label");
-  reviewLabel.className = "checkbox-group task-review-checkbox";
-  const reviewInput = document.createElement("input");
-  reviewInput.type = "checkbox";
-  reviewInput.name = "reviewRequested";
-  const reviewText = document.createElement("span");
-  reviewText.textContent = t("tasks.review_requested_label");
-  reviewLabel.appendChild(reviewInput);
-  reviewLabel.appendChild(reviewText);
-
   grid.appendChild(titleGroup);
   grid.appendChild(descriptionGroup);
   grid.appendChild(dueDateGroup);
-  grid.appendChild(reviewLabel);
+
+  if (canRequestReview()) {
+    const reviewLabel = document.createElement("label");
+    reviewLabel.className = "checkbox-group task-review-checkbox";
+    const reviewInput = document.createElement("input");
+    reviewInput.type = "checkbox";
+    reviewInput.name = "reviewRequested";
+    const reviewText = document.createElement("span");
+    reviewText.textContent = t("tasks.review_requested_label");
+    reviewLabel.appendChild(reviewInput);
+    reviewLabel.appendChild(reviewText);
+    grid.appendChild(reviewLabel);
+  }
+
   form.appendChild(grid);
 
   const actions = document.createElement("div");
@@ -440,6 +501,11 @@ function createTaskElement(task) {
   const item = document.createElement("li");
   item.className = "task-item";
   item.dataset.taskId = task.id;
+
+  if (canEditCurrentBoard() && editingTaskId !== task.id) {
+    item.draggable = true;
+    item.classList.add("task-item-draggable");
+  }
 
   const title = document.createElement("p");
   title.className = "task-title";
@@ -491,6 +557,7 @@ function createTaskElement(task) {
   }
 
   if (canEditCurrentBoard() && editingTaskId === task.id) {
+    item.classList.add("task-item-editing");
     item.appendChild(buildTaskEditForm(task));
   }
 
@@ -520,6 +587,7 @@ function renderBoardColumns(columns, tasks) {
   columns.forEach((column) => {
     const columnCard = document.createElement("article");
     columnCard.className = "column-card";
+    columnCard.dataset.columnId = column.id;
 
     const columnHeader = document.createElement("div");
     columnHeader.className = "column-header";
@@ -573,6 +641,7 @@ function renderBoardDetail(board, columns, tasks) {
   boardDetailDescription.textContent = board.description || t("boards.no_description");
   boardDetailVisibility.textContent = formatBoardMeta(board);
   toggleSharePanelBtn.classList.toggle("hidden", !canShareCurrentBoard());
+  deleteBoardBtn.classList.toggle("hidden", !canDeleteCurrentBoard());
   if (!canShareCurrentBoard()) {
     setSharePanelVisibility(false);
   }
@@ -582,10 +651,6 @@ function renderBoardDetail(board, columns, tasks) {
 function createBoardListItem(board) {
   const listItem = document.createElement("li");
   listItem.className = "board-list-item";
-
-  if (board.id === selectedBoardId) {
-    listItem.classList.add("active");
-  }
 
   const openButton = document.createElement("button");
   openButton.type = "button";
@@ -654,6 +719,112 @@ async function loadBoardDetail(boardId) {
   renderBoardDetail(board, columns, tasks);
 }
 
+async function refreshCurrentBoardTasks() {
+  if (!selectedBoardId) {
+    return;
+  }
+
+  currentBoardTasksState = await fetchBoardTasks(selectedBoardId);
+  renderCurrentBoard();
+}
+
+function handleBoardColumnsDragStart(event) {
+  if (!canEditCurrentBoard()) {
+    return;
+  }
+
+  const taskItem = event.target.closest(".task-item-draggable");
+  if (!taskItem) {
+    return;
+  }
+
+  const taskId = Number.parseInt(taskItem.dataset.taskId, 10);
+  if (!Number.isFinite(taskId)) {
+    return;
+  }
+
+  draggedTaskId = taskId;
+  taskItem.classList.add("task-item-dragging");
+
+  if (event.dataTransfer) {
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", String(taskId));
+  }
+}
+
+function handleBoardColumnsDragOver(event) {
+  if (!canEditCurrentBoard() || !Number.isFinite(draggedTaskId)) {
+    return;
+  }
+
+  const columnCard = event.target.closest(".column-card");
+  if (!columnCard) {
+    return;
+  }
+
+  const columnId = Number.parseInt(columnCard.dataset.columnId, 10);
+  if (!Number.isFinite(columnId)) {
+    return;
+  }
+
+  event.preventDefault();
+
+  if (event.dataTransfer) {
+    event.dataTransfer.dropEffect = "move";
+  }
+
+  highlightDropColumn(columnId);
+}
+
+function handleBoardColumnsDragEnd() {
+  clearDragState();
+}
+
+async function handleBoardColumnsDrop(event) {
+  if (!canEditCurrentBoard() || !Number.isFinite(draggedTaskId)) {
+    return;
+  }
+
+  const columnCard = event.target.closest(".column-card");
+  if (!columnCard) {
+    clearDragState();
+    return;
+  }
+
+  event.preventDefault();
+
+  const columnId = Number.parseInt(columnCard.dataset.columnId, 10);
+  if (!Number.isFinite(columnId)) {
+    clearDragState();
+    return;
+  }
+
+  const task = currentBoardTasksState.find((entry) => entry.id === draggedTaskId);
+  if (!task) {
+    clearDragState();
+    return;
+  }
+
+  const taskId = draggedTaskId;
+  clearDragState();
+
+  if (task.columnId === columnId) {
+    return;
+  }
+
+  const previousTasksState = currentBoardTasksState.map((entry) => ({ ...entry }));
+  moveTaskInState(taskId, columnId);
+  renderCurrentBoard();
+
+  try {
+    await updateTask(taskId, { columnId });
+  } catch (error) {
+    currentBoardTasksState = previousTasksState;
+    renderCurrentBoard();
+    showMessage(boardDetailMessage, error.message, "error");
+  }
+}
+
 async function loadBoards() {
   const boards = await fetchBoards();
   boardListState = boards;
@@ -680,10 +851,12 @@ async function handlePendingInviteAfterAuth() {
   try {
     const board = await acceptBoardInvite(pendingInviteToken);
     clearInviteTokenFromUrl();
-    await loadBoards();
-    await loadBoardDetail(board.id);
+    selectedBoardId = board.id;
+    pendingBoardDetailMessage = {
+      text: t("share.join_success"),
+      type: "success",
+    };
     navigateTo("board");
-    showMessage(boardDetailMessage, t("share.join_success"), "success");
     return true;
   } catch (error) {
     clearInviteTokenFromUrl();
@@ -811,9 +984,11 @@ async function handleCreateBoard(event) {
     createBoardForm.reset();
     createBoardVisibilityInput.value = "private";
     setBoardFormVisibility(false);
-    showMessage(boardMessage, t("boards.create_success"), "success");
-    await loadBoards();
-    await loadBoardDetail(board.id);
+    selectedBoardId = board.id;
+    pendingBoardDetailMessage = {
+      text: t("boards.create_success"),
+      type: "success",
+    };
     navigateTo("board");
   } catch (error) {
     showMessage(boardMessage, error.message, "error");
@@ -833,10 +1008,43 @@ async function handleCreateShareLink(event) {
     shareLinkInput.value = invite.inviteUrl;
     shareLinkBox.classList.remove("hidden");
     showMessage(shareMessage, t("share.create_success"), "success");
-    await loadBoards();
-    await loadBoardDetail(selectedBoardId);
+    updateBoardState(selectedBoardId, { visibility: "shared" });
+    renderCurrentBoard();
   } catch (error) {
     showMessage(shareMessage, error.message, "error");
+  }
+}
+
+async function handleDeleteBoard() {
+  if (!selectedBoardId || !canDeleteCurrentBoard()) {
+    return;
+  }
+
+  const confirmed = confirm(t("boards.delete_confirm"));
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    const boardId = selectedBoardId;
+    await deleteBoard(boardId);
+
+    pendingBoardsMessage = {
+      text: t("boards.delete_success"),
+      type: "success",
+    };
+
+    boardListState = boardListState.filter((board) => board.id !== boardId);
+    selectedBoardId = null;
+    currentBoardState = null;
+    currentBoardColumnsState = [];
+    currentBoardTasksState = [];
+    resetTaskUiState();
+    setSharePanelVisibility(false);
+
+    navigateTo("boards");
+  } catch (error) {
+    showMessage(boardDetailMessage, error.message, "error");
   }
 }
 
@@ -852,13 +1060,8 @@ function handleBoardsListClick(event) {
   }
 
   hideMessage(boardDetailMessage);
-  loadBoardDetail(boardId)
-    .then(() => {
-      navigateTo("board");
-    })
-    .catch((error) => {
-      showMessage(boardMessage, error.message, "error");
-    });
+  selectedBoardId = boardId;
+  navigateTo("board");
 }
 
 async function handleBoardColumnsClick(event) {
@@ -922,7 +1125,7 @@ async function handleBoardColumnsClick(event) {
     try {
       await deleteTask(taskId);
       editingTaskId = null;
-      await loadBoardDetail(selectedBoardId);
+      await refreshCurrentBoardTasks();
       showMessage(boardDetailMessage, t("tasks.delete_success"), "success");
     } catch (error) {
       showMessage(boardDetailMessage, error.message, "error");
@@ -951,19 +1154,16 @@ async function handleBoardColumnsSubmit(event) {
         return;
       }
 
-      const task = await createTask(selectedBoardId, {
+      await createTask(selectedBoardId, {
         title: taskValues.title,
         description: taskValues.description,
         dueDate: taskValues.dueDate,
         columnId,
+        reviewRequested: taskValues.reviewRequested,
       });
 
-      if (taskValues.reviewRequested) {
-        await updateTask(task.id, { reviewRequested: true });
-      }
-
       activeCreateColumnId = null;
-      await loadBoardDetail(selectedBoardId);
+      await refreshCurrentBoardTasks();
       showMessage(boardDetailMessage, t("tasks.create_success"), "success");
       return;
     }
@@ -982,7 +1182,7 @@ async function handleBoardColumnsSubmit(event) {
     });
 
     editingTaskId = null;
-    await loadBoardDetail(selectedBoardId);
+    await refreshCurrentBoardTasks();
     showMessage(boardDetailMessage, t("tasks.update_success"), "success");
   } catch (error) {
     showMessage(boardDetailMessage, error.message, "error");
@@ -1005,7 +1205,12 @@ function handleNavigation(viewName) {
   if (viewName === "boards") {
     setSharePanelVisibility(false);
     showUserInfo(currentUser);
-    loadBoards().catch((error) => {
+    loadBoards().then(() => {
+      if (pendingBoardsMessage) {
+        showMessage(boardMessage, pendingBoardsMessage.text, pendingBoardsMessage.type);
+        pendingBoardsMessage = null;
+      }
+    }).catch((error) => {
       showMessage(boardMessage, error.message, "error");
     });
   }
@@ -1018,10 +1223,21 @@ function handleNavigation(viewName) {
       return;
     }
 
-    loadBoardDetail(selectedBoardId).catch((error) => {
-      showMessage(boardMessage, error.message, "error");
-      navigateTo("boards");
-    });
+    loadBoardDetail(selectedBoardId)
+      .then(() => {
+        if (pendingBoardDetailMessage) {
+          showMessage(
+            boardDetailMessage,
+            pendingBoardDetailMessage.text,
+            pendingBoardDetailMessage.type,
+          );
+          pendingBoardDetailMessage = null;
+        }
+      })
+      .catch((error) => {
+        showMessage(boardMessage, error.message, "error");
+        navigateTo("boards");
+      });
   }
 
   if (viewName === "account") {
@@ -1042,6 +1258,7 @@ async function init() {
   openAccountBtn.addEventListener("click", handleOpenAccount);
   boardAccountBtn.addEventListener("click", handleBoardAccount);
   boardBackBtn.addEventListener("click", handleBoardBack);
+  deleteBoardBtn.addEventListener("click", handleDeleteBoard);
   backToBoardsBtn.addEventListener("click", handleBackToBoards);
   logoutBtn.addEventListener("click", handleLogout);
   editSection.addEventListener("user-updated", handleUserUpdated);
@@ -1054,6 +1271,10 @@ async function init() {
   shareBoardForm.addEventListener("submit", handleCreateShareLink);
   boardsList.addEventListener("click", handleBoardsListClick);
   boardColumns.addEventListener("click", handleBoardColumnsClick);
+  boardColumns.addEventListener("dragstart", handleBoardColumnsDragStart);
+  boardColumns.addEventListener("dragover", handleBoardColumnsDragOver);
+  boardColumns.addEventListener("dragend", handleBoardColumnsDragEnd);
+  boardColumns.addEventListener("drop", handleBoardColumnsDrop);
   boardColumns.addEventListener("submit", handleBoardColumnsSubmit);
   setBoardFormVisibility(false);
   setSharePanelVisibility(false);

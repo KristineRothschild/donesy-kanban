@@ -70,6 +70,10 @@ export async function createBoard(boardData) {
   return data.board;
 }
 
+export async function deleteBoard(boardId) {
+  await apiRequest(`/boards/${boardId}`, "DELETE", null);
+}
+
 export async function fetchBoard(boardId) {
   const data = await apiRequest(`/boards/${boardId}`, "GET", null);
   return data.board;

@@ -83,6 +83,7 @@ export function createTasksService({ db, boardsService }) {
       body.dueDate === undefined || body.dueDate === null || body.dueDate === ""
         ? null
         : body.dueDate;
+    const reviewRequested = body.reviewRequested === undefined ? false : Boolean(body.reviewRequested);
     let assigneeUserId = body.assigneeUserId;
     if (assigneeUserId === undefined || assigneeUserId === null) {
       assigneeUserId = null;
@@ -94,10 +95,19 @@ export function createTasksService({ db, boardsService }) {
     }
 
     const result = await db.query(
-      `INSERT INTO tasks (board_id, column_id, title, description, due_date, assignee_user_id, position)
-       VALUES ($1, $2, $3, $4, $5, $6, 0)
+      `INSERT INTO tasks (
+         board_id,
+         column_id,
+         title,
+         description,
+         due_date,
+         assignee_user_id,
+         review_requested,
+         position
+       )
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 0)
        RETURNING *`,
-      [boardId, columnId, title.trim(), description, dueDate, assigneeUserId],
+      [boardId, columnId, title.trim(), description, dueDate, assigneeUserId, reviewRequested],
     );
     return toTaskResponse(result.rows[0]);
   }
