@@ -641,6 +641,15 @@ main {
   border: 1px solid rgba(74, 123, 167, 0.16);
 }
 
+.board-edit-panel {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(243, 249, 255, 0.92));
+}
+
+.board-edit-form .task-actions {
+  margin-top: 18px;
+}
+
 .share-panel-header {
   display: flex;
   justify-content: space-between;

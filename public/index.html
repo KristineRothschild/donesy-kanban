@@ -190,6 +190,14 @@
 
             <div class="header-actions">
               <button
+                id="toggle-board-edit-btn"
+                type="button"
+                class="secondary-btn secondary-btn-small hidden"
+                data-i18n="boards.edit_button"
+              >
+                Edit board
+              </button>
+              <button
                 id="toggle-share-panel-btn"
                 type="button"
                 class="secondary-btn secondary-btn-small hidden"
@@ -243,6 +251,63 @@
               role="status"
               aria-live="polite"
             ></div>
+
+            <section
+              id="board-edit-panel"
+              class="share-panel board-edit-panel hidden"
+              aria-labelledby="board-edit-panel-title"
+            >
+              <div class="share-panel-header">
+                <div>
+                  <h3 id="board-edit-panel-title" data-i18n="boards.edit_title">Edit board</h3>
+                  <p class="share-panel-text" data-i18n="boards.edit_subtitle">
+                    Update the board name and description without leaving the board page.
+                  </p>
+                </div>
+              </div>
+
+              <form id="edit-board-form" class="board-edit-form">
+                <div class="task-form-grid">
+                  <div class="input-group">
+                    <label for="edit-board-name" data-i18n="boards.name_label">Board name</label>
+                    <input
+                      id="edit-board-name"
+                      name="name"
+                      type="text"
+                      maxlength="120"
+                      required
+                    />
+                  </div>
+
+                  <div class="input-group task-form-wide">
+                    <label for="edit-board-description" data-i18n="boards.description_label">
+                      Description
+                    </label>
+                    <textarea
+                      id="edit-board-description"
+                      name="description"
+                      rows="3"
+                      data-i18n-placeholder="boards.description_placeholder"
+                      placeholder="Optional description"
+                    ></textarea>
+                  </div>
+                </div>
+
+                <div class="task-actions">
+                  <button type="submit" class="task-action-btn" data-i18n="boards.update_button">
+                    Save board
+                  </button>
+                  <button
+                    id="cancel-board-edit-btn"
+                    type="button"
+                    class="task-action-btn"
+                    data-i18n="boards.cancel_button"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </section>
 
             <section id="share-panel" class="share-panel hidden" aria-labelledby="share-panel-title">
               <div class="share-panel-header">
