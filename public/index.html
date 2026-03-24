@@ -78,7 +78,172 @@
           <user-create class="hidden" id="register-section"></user-create>
         </div>
 
-        <div id="account-view" class="auth-wrapper hidden">
+        <div id="boards-view" class="workspace-shell hidden">
+          <header class="workspace-header">
+            <div>
+              <p class="workspace-kicker" data-i18n="boards.kicker">Workspace</p>
+              <h2 class="workspace-title" data-i18n="boards.title">MY BOARDS</h2>
+            </div>
+
+            <button
+              id="open-account-btn"
+              type="button"
+              class="secondary-btn"
+              data-i18n="boards.account_button"
+            >
+              My account
+            </button>
+          </header>
+
+          <div class="workspace-grid">
+            <section class="auth-card boards-card boards-overview-card" aria-labelledby="boards-title">
+              <div class="boards-section-header">
+                <div>
+                  <h3 id="boards-title" data-i18n="boards.list_title">Board overview</h3>
+                  <p class="section-subtitle section-subtitle-left" data-i18n="boards.subtitle">
+                    Create a board and open it to see your columns and tasks.
+                  </p>
+                </div>
+                <button
+                  id="toggle-board-form-btn"
+                  type="button"
+                  class="secondary-btn secondary-btn-small"
+                  data-i18n="boards.new_board_button"
+                >
+                  New board
+                </button>
+              </div>
+
+              <form id="create-board-form" class="stack-form hidden">
+                <div class="input-group">
+                  <label for="create-board-name" data-i18n="boards.name_label">Board name</label>
+                  <input
+                    type="text"
+                    id="create-board-name"
+                    name="name"
+                    required
+                    maxlength="80"
+                    placeholder="Project board"
+                    data-i18n-placeholder="boards.name_placeholder"
+                  />
+                </div>
+
+                <div class="input-group">
+                  <label for="create-board-description" data-i18n="boards.description_label"
+                    >Description</label
+                  >
+                  <textarea
+                    id="create-board-description"
+                    name="description"
+                    rows="3"
+                    placeholder="Optional description"
+                    data-i18n-placeholder="boards.description_placeholder"
+                  ></textarea>
+                </div>
+
+                <div class="input-group">
+                  <label for="create-board-visibility" data-i18n="boards.visibility_label"
+                    >Visibility</label
+                  >
+                  <select id="create-board-visibility" name="visibility">
+                    <option value="private" data-i18n="boards.visibility_private">Private</option>
+                    <option value="shared" data-i18n="boards.visibility_shared">Shared</option>
+                  </select>
+                </div>
+
+                <div class="form-actions">
+                  <button type="submit" class="auth-btn" data-i18n="boards.create_button">
+                    CREATE BOARD
+                  </button>
+                  <button
+                    id="cancel-board-form-btn"
+                    type="button"
+                    class="secondary-btn secondary-btn-small"
+                    data-i18n="boards.cancel_button"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+
+              <div
+                id="board-message"
+                class="message"
+                role="status"
+                aria-live="polite"
+              ></div>
+
+              <p id="boards-empty" class="empty-state" data-i18n="boards.empty">
+                You do not have any boards yet.
+              </p>
+              <ul id="boards-list" class="boards-list" aria-live="polite"></ul>
+            </section>
+          </div>
+        </div>
+
+        <div id="board-view" class="workspace-shell hidden">
+          <header class="workspace-header">
+            <div>
+              <p class="workspace-kicker" data-i18n="boards.detail_kicker">Selected board</p>
+              <h2 id="board-page-title" class="workspace-title"></h2>
+            </div>
+
+            <div class="header-actions">
+              <button
+                id="board-back-btn"
+                type="button"
+                class="secondary-btn secondary-btn-small"
+                data-i18n="boards.back_button"
+              >
+                Back to boards
+              </button>
+              <button
+                id="board-account-btn"
+                type="button"
+                class="secondary-btn secondary-btn-small"
+                data-i18n="boards.account_button"
+              >
+                My account
+              </button>
+            </div>
+          </header>
+
+          <section
+            id="board-detail-card"
+            class="auth-card board-detail-card"
+            aria-labelledby="board-detail-name"
+          >
+            <div class="board-detail-header">
+              <div>
+                <h2 id="board-detail-name"></h2>
+                <p id="board-detail-description" class="board-detail-description"></p>
+              </div>
+              <span id="board-detail-visibility" class="detail-pill"></span>
+            </div>
+
+            <div
+              id="board-detail-message"
+              class="message"
+              role="status"
+              aria-live="polite"
+            ></div>
+
+            <div id="board-columns" class="board-columns"></div>
+          </section>
+        </div>
+
+        <div id="account-view" class="account-shell hidden">
+          <div class="account-header-row">
+            <button
+              id="back-to-boards-btn"
+              type="button"
+              class="secondary-btn secondary-btn-small"
+              data-i18n="account.back_to_boards"
+            >
+              Back to boards
+            </button>
+          </div>
+
           <div class="auth-card user-card">
             <h2 data-i18n="account.title">MY ACCOUNT</h2>
 

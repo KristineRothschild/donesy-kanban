@@ -1,7 +1,7 @@
 async function apiRequest(url, method, body, requestOptions = {}) {
   const { allowUnauthorized = false } = requestOptions;
   const options = {
-    method: method,
+    method,
     headers: {},
     credentials: "include",
   };
@@ -52,10 +52,49 @@ export async function logoutUser() {
 }
 
 export async function updateUser(userId, userData) {
-  const data = await apiRequest("/users/" + userId, "PUT", userData);
+  const data = await apiRequest(`/users/${userId}`, "PUT", userData);
   return data.user;
 }
 
 export async function deleteUser(userId) {
-  return apiRequest("/users/" + userId, "DELETE", null);
+  return apiRequest(`/users/${userId}`, "DELETE", null);
+}
+
+export async function fetchBoards() {
+  const data = await apiRequest("/boards", "GET", null);
+  return data.boards;
+}
+
+export async function createBoard(boardData) {
+  const data = await apiRequest("/boards", "POST", boardData);
+  return data.board;
+}
+
+export async function fetchBoard(boardId) {
+  const data = await apiRequest(`/boards/${boardId}`, "GET", null);
+  return data.board;
+}
+
+export async function fetchBoardColumns(boardId) {
+  const data = await apiRequest(`/boards/${boardId}/columns`, "GET", null);
+  return data.columns;
+}
+
+export async function fetchBoardTasks(boardId) {
+  const data = await apiRequest(`/boards/${boardId}/tasks`, "GET", null);
+  return data.tasks;
+}
+
+export async function createTask(boardId, taskData) {
+  const data = await apiRequest(`/boards/${boardId}/tasks`, "POST", taskData);
+  return data.task;
+}
+
+export async function updateTask(taskId, taskData) {
+  const data = await apiRequest(`/tasks/${taskId}`, "PUT", taskData);
+  return data.task;
+}
+
+export async function deleteTask(taskId) {
+  await apiRequest(`/tasks/${taskId}`, "DELETE", null);
 }
