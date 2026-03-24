@@ -1,8 +1,13 @@
 let translations = {};
 
 const supportedLangs = ["en", "nb"];
+const languageAliases = {
+  no: "nb",
+};
+
 const browserLang = navigator.language.split("-")[0];
-const lang = supportedLangs.includes(browserLang) ? browserLang : "en";
+const normalizedLang = languageAliases[browserLang] || browserLang;
+const lang = supportedLangs.includes(normalizedLang) ? normalizedLang : "en";
 
 const ready = fetch(`/i18n/${lang}.json`)
   .then((res) => res.json())
