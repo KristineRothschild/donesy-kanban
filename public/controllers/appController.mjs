@@ -5,6 +5,7 @@ import {
   fetchBoardColumns,
   fetchBoardTasks,
   createBoard,
+  updateBoard,
   deleteBoard,
   createBoardInvite,
   createTask,
@@ -39,6 +40,12 @@ const displayEmail = document.getElementById("display-email");
 const openAccountBtn = document.getElementById("open-account-btn");
 const boardAccountBtn = document.getElementById("board-account-btn");
 const boardBackBtn = document.getElementById("board-back-btn");
+const toggleBoardEditBtn = document.getElementById("toggle-board-edit-btn");
+const boardEditPanel = document.getElementById("board-edit-panel");
+const editBoardForm = document.getElementById("edit-board-form");
+const editBoardNameInput = document.getElementById("edit-board-name");
+const editBoardDescriptionInput = document.getElementById("edit-board-description");
+const cancelBoardEditBtn = document.getElementById("cancel-board-edit-btn");
 const deleteBoardBtn = document.getElementById("delete-board-btn");
 const backToBoardsBtn = document.getElementById("back-to-boards-btn");
 const logoutBtn = document.getElementById("logout-btn");
@@ -69,8 +76,6 @@ const boardDetailVisibility = document.getElementById("board-detail-visibility")
 const boardColumns = document.getElementById("board-columns");
 
 let pendingInviteToken = new URLSearchParams(window.location.search).get("invite");
-let pendingBoardsMessage = null;
-let pendingBoardDetailMessage = null;
 let boardListState = [];
 let selectedBoardId = null;
 let currentBoardState = null;
@@ -169,6 +174,10 @@ function canRequestReview() {
   return currentBoardState?.visibility === "shared";
 }
 
+function canEditBoardSettings() {
+  return currentBoardState?.role === "owner";
+}
+
 function clearDragState() {
   draggedTaskId = null;
   activeDropColumnId = null;
@@ -251,6 +260,19 @@ function setSharePanelVisibility(isVisible) {
   }
 }
 
+function setBoardEditPanelVisibility(isVisible) {
+  boardEditPanel.classList.toggle("hidden", !isVisible);
+
+  if (!isVisible) {
+    editBoardForm.reset();
+  }
+}
+
+function populateBoardEditForm(board) {
+  editBoardNameInput.value = board.name;
+  editBoardDescriptionInput.value = board.description || "";
+}
+
 function clearInviteTokenFromUrl() {
   const url = new URL(window.location.href);
   url.searchParams.delete("invite");
@@ -303,6 +325,7 @@ function clearBoardsView() {
   currentBoardTasksState = [];
   resetTaskUiState();
   setBoardFormVisibility(false);
+  setBoardEditPanelVisibility(false);
   setSharePanelVisibility(false);
   boardsList.innerHTML = "";
   boardColumns.innerHTML = "";
@@ -313,6 +336,7 @@ function clearBoardsView() {
   boardsEmpty.classList.remove("hidden");
   hideMessage(boardMessage);
   hideMessage(boardDetailMessage);
+  toggleBoardEditBtn.classList.add("hidden");
   toggleSharePanelBtn.classList.add("hidden");
   deleteBoardBtn.classList.add("hidden");
 }
@@ -640,8 +664,15 @@ function renderBoardDetail(board, columns, tasks) {
   boardDetailName.textContent = board.name;
   boardDetailDescription.textContent = board.description || t("boards.no_description");
   boardDetailVisibility.textContent = formatBoardMeta(board);
+  toggleBoardEditBtn.classList.toggle("hidden", !canEditBoardSettings());
   toggleSharePanelBtn.classList.toggle("hidden", !canShareCurrentBoard());
   deleteBoardBtn.classList.toggle("hidden", !canDeleteCurrentBoard());
+  if (canEditBoardSettings() && !boardEditPanel.classList.contains("hidden")) {
+    populateBoardEditForm(board);
+  }
+  if (!canEditBoardSettings()) {
+    setBoardEditPanelVisibility(false);
+  }
   if (!canShareCurrentBoard()) {
     setSharePanelVisibility(false);
   }
@@ -852,10 +883,6 @@ async function handlePendingInviteAfterAuth() {
     const board = await acceptBoardInvite(pendingInviteToken);
     clearInviteTokenFromUrl();
     selectedBoardId = board.id;
-    pendingBoardDetailMessage = {
-      text: t("share.join_success"),
-      type: "success",
-    };
     navigateTo("board");
     return true;
   } catch (error) {
@@ -927,7 +954,6 @@ function handleUserUpdated(event) {
 
 function handleUserDeleted() {
   goToLogin({ resetForm: true });
-  alert(t("account.deleted"));
 }
 
 function handleOpenAccount() {
@@ -959,11 +985,28 @@ function handleHideBoardForm() {
 
 function handleShowSharePanel() {
   hideMessage(shareMessage);
+  setBoardEditPanelVisibility(false);
   setSharePanelVisibility(true);
 }
 
 function handleHideSharePanel() {
   setSharePanelVisibility(false);
+}
+
+function handleShowBoardEditPanel() {
+  if (!currentBoardState || !canEditBoardSettings()) {
+    return;
+  }
+
+  hideMessage(boardDetailMessage);
+  setSharePanelVisibility(false);
+  populateBoardEditForm(currentBoardState);
+  setBoardEditPanelVisibility(true);
+  editBoardNameInput.focus();
+}
+
+function handleHideBoardEditPanel() {
+  setBoardEditPanelVisibility(false);
 }
 
 async function handleCreateBoard(event) {
@@ -985,10 +1028,6 @@ async function handleCreateBoard(event) {
     createBoardVisibilityInput.value = "private";
     setBoardFormVisibility(false);
     selectedBoardId = board.id;
-    pendingBoardDetailMessage = {
-      text: t("boards.create_success"),
-      type: "success",
-    };
     navigateTo("board");
   } catch (error) {
     showMessage(boardMessage, error.message, "error");
@@ -1007,11 +1046,41 @@ async function handleCreateShareLink(event) {
     const invite = await createBoardInvite(selectedBoardId, shareRoleInput.value);
     shareLinkInput.value = invite.inviteUrl;
     shareLinkBox.classList.remove("hidden");
-    showMessage(shareMessage, t("share.create_success"), "success");
     updateBoardState(selectedBoardId, { visibility: "shared" });
     renderCurrentBoard();
   } catch (error) {
     showMessage(shareMessage, error.message, "error");
+  }
+}
+
+async function handleUpdateBoard(event) {
+  event.preventDefault();
+  hideMessage(boardDetailMessage);
+
+  if (!selectedBoardId || !canEditBoardSettings()) {
+    return;
+  }
+
+  const name = editBoardNameInput.value.trim();
+  const description = editBoardDescriptionInput.value.trim();
+
+  try {
+    const board = await updateBoard(selectedBoardId, {
+      name,
+      description,
+    });
+
+    updateBoardState(selectedBoardId, {
+      name: board.name,
+      description: board.description,
+      visibility: board.visibility,
+      role: board.role,
+    });
+    renderBoards(boardListState);
+    renderCurrentBoard();
+    setBoardEditPanelVisibility(false);
+  } catch (error) {
+    showMessage(boardDetailMessage, error.message, "error");
   }
 }
 
@@ -1020,6 +1089,7 @@ async function handleDeleteBoard() {
     return;
   }
 
+  hideMessage(boardDetailMessage);
   const confirmed = confirm(t("boards.delete_confirm"));
   if (!confirmed) {
     return;
@@ -1028,11 +1098,6 @@ async function handleDeleteBoard() {
   try {
     const boardId = selectedBoardId;
     await deleteBoard(boardId);
-
-    pendingBoardsMessage = {
-      text: t("boards.delete_success"),
-      type: "success",
-    };
 
     boardListState = boardListState.filter((board) => board.id !== boardId);
     selectedBoardId = null;
@@ -1123,10 +1188,10 @@ async function handleBoardColumnsClick(event) {
     }
 
     try {
+      hideMessage(boardDetailMessage);
       await deleteTask(taskId);
       editingTaskId = null;
       await refreshCurrentBoardTasks();
-      showMessage(boardDetailMessage, t("tasks.delete_success"), "success");
     } catch (error) {
       showMessage(boardDetailMessage, error.message, "error");
     }
@@ -1140,6 +1205,7 @@ async function handleBoardColumnsSubmit(event) {
   }
 
   event.preventDefault();
+  hideMessage(boardDetailMessage);
 
   if (!canEditCurrentBoard()) {
     return;
@@ -1164,7 +1230,6 @@ async function handleBoardColumnsSubmit(event) {
 
       activeCreateColumnId = null;
       await refreshCurrentBoardTasks();
-      showMessage(boardDetailMessage, t("tasks.create_success"), "success");
       return;
     }
 
@@ -1183,7 +1248,6 @@ async function handleBoardColumnsSubmit(event) {
 
     editingTaskId = null;
     await refreshCurrentBoardTasks();
-    showMessage(boardDetailMessage, t("tasks.update_success"), "success");
   } catch (error) {
     showMessage(boardDetailMessage, error.message, "error");
   }
@@ -1203,14 +1267,10 @@ function handleNavigation(viewName) {
   }
 
   if (viewName === "boards") {
+    setBoardEditPanelVisibility(false);
     setSharePanelVisibility(false);
     showUserInfo(currentUser);
-    loadBoards().then(() => {
-      if (pendingBoardsMessage) {
-        showMessage(boardMessage, pendingBoardsMessage.text, pendingBoardsMessage.type);
-        pendingBoardsMessage = null;
-      }
-    }).catch((error) => {
+    loadBoards().catch((error) => {
       showMessage(boardMessage, error.message, "error");
     });
   }
@@ -1223,24 +1283,14 @@ function handleNavigation(viewName) {
       return;
     }
 
-    loadBoardDetail(selectedBoardId)
-      .then(() => {
-        if (pendingBoardDetailMessage) {
-          showMessage(
-            boardDetailMessage,
-            pendingBoardDetailMessage.text,
-            pendingBoardDetailMessage.type,
-          );
-          pendingBoardDetailMessage = null;
-        }
-      })
-      .catch((error) => {
+    loadBoardDetail(selectedBoardId).catch((error) => {
         showMessage(boardMessage, error.message, "error");
         navigateTo("boards");
       });
   }
 
   if (viewName === "account") {
+    setBoardEditPanelVisibility(false);
     setSharePanelVisibility(false);
     showUserInfo(currentUser);
   }
@@ -1258,6 +1308,8 @@ async function init() {
   openAccountBtn.addEventListener("click", handleOpenAccount);
   boardAccountBtn.addEventListener("click", handleBoardAccount);
   boardBackBtn.addEventListener("click", handleBoardBack);
+  toggleBoardEditBtn.addEventListener("click", handleShowBoardEditPanel);
+  cancelBoardEditBtn.addEventListener("click", handleHideBoardEditPanel);
   deleteBoardBtn.addEventListener("click", handleDeleteBoard);
   backToBoardsBtn.addEventListener("click", handleBackToBoards);
   logoutBtn.addEventListener("click", handleLogout);
@@ -1268,6 +1320,7 @@ async function init() {
   toggleSharePanelBtn.addEventListener("click", handleShowSharePanel);
   closeSharePanelBtn.addEventListener("click", handleHideSharePanel);
   createBoardForm.addEventListener("submit", handleCreateBoard);
+  editBoardForm.addEventListener("submit", handleUpdateBoard);
   shareBoardForm.addEventListener("submit", handleCreateShareLink);
   boardsList.addEventListener("click", handleBoardsListClick);
   boardColumns.addEventListener("click", handleBoardColumnsClick);
@@ -1277,6 +1330,7 @@ async function init() {
   boardColumns.addEventListener("drop", handleBoardColumnsDrop);
   boardColumns.addEventListener("submit", handleBoardColumnsSubmit);
   setBoardFormVisibility(false);
+  setBoardEditPanelVisibility(false);
   setSharePanelVisibility(false);
   resetTaskUiState();
 

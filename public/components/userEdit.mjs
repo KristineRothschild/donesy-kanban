@@ -49,14 +49,9 @@ class UserEdit extends HTMLElement {
 
     try {
       const user = await updateUser(userId, { name: name });
-
-      this.showMessage(t("edit.success"), "success");
       this.querySelector("#edit-form").reset();
-
-      setTimeout(() => {
-        this.hideEditForm();
-        this.hideMessage();
-      }, 1000);
+      this.hideEditForm();
+      this.hideMessage();
 
       this.dispatchEvent(new CustomEvent("user-updated", {
         detail: { user: user },

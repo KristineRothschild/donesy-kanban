@@ -36,8 +36,6 @@ class UserDelete extends HTMLElement {
     try {
       await deleteUser(userId);
 
-      this.showMessage(t("delete.success"), "success");
-
       this.dispatchEvent(new CustomEvent("user-deleted", {
         detail: { userId: userId },
         bubbles: true,

@@ -46,7 +46,6 @@ class UserCreate extends HTMLElement {
         acceptedPrivacy: this.querySelector("#accept-privacy").checked,
       });
 
-      this.showMessage(t("register.success"), "success");
       this.querySelector("#register-form").reset();
 
       this.dispatchEvent(new CustomEvent("user-created", {
