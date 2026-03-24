@@ -90,6 +90,16 @@ export async function createTask(boardId, taskData) {
   return data.task;
 }
 
+export async function createBoardInvite(boardId, role) {
+  const data = await apiRequest(`/boards/${boardId}/invites`, "POST", { role });
+  return data.invite;
+}
+
+export async function acceptBoardInvite(token) {
+  const data = await apiRequest(`/boards/invites/${token}/accept`, "POST", null);
+  return data.board;
+}
+
 export async function updateTask(taskId, taskData) {
   const data = await apiRequest(`/tasks/${taskId}`, "PUT", taskData);
   return data.task;

@@ -628,6 +628,54 @@ main {
   white-space: nowrap;
 }
 
+.share-panel {
+  margin-bottom: 24px;
+  padding: 18px;
+  border-radius: 14px;
+  background-color: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(74, 123, 167, 0.16);
+}
+
+.share-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.share-panel-text {
+  color: #4a6a85;
+  margin-top: 6px;
+}
+
+.share-form {
+  display: flex;
+  gap: 14px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.share-link-box {
+  margin-top: 14px;
+}
+
+.share-link-box label {
+  display: block;
+  color: #2d5a7b;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.share-link-box input {
+  width: 100%;
+  border: 1px solid rgba(74, 123, 167, 0.25);
+  border-radius: 10px;
+  padding: 12px 14px;
+  background-color: rgba(255, 255, 255, 0.92);
+  color: #2d5a7b;
+}
+
 .board-columns {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -804,7 +852,9 @@ main {
   .workspace-header,
   .header-actions,
   .boards-section-header,
-  .form-actions {
+  .form-actions,
+  .share-panel-header,
+  .share-form {
     flex-direction: column;
     align-items: stretch;
   }

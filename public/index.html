@@ -190,6 +190,14 @@
 
             <div class="header-actions">
               <button
+                id="toggle-share-panel-btn"
+                type="button"
+                class="secondary-btn secondary-btn-small hidden"
+                data-i18n="share.button"
+              >
+                Share board
+              </button>
+              <button
                 id="board-back-btn"
                 type="button"
                 class="secondary-btn secondary-btn-small"
@@ -227,6 +235,51 @@
               role="status"
               aria-live="polite"
             ></div>
+
+            <section id="share-panel" class="share-panel hidden" aria-labelledby="share-panel-title">
+              <div class="share-panel-header">
+                <div>
+                  <h3 id="share-panel-title" data-i18n="share.title">Share board</h3>
+                  <p class="share-panel-text" data-i18n="share.subtitle">
+                    Create a link and choose whether people can view or edit tasks.
+                  </p>
+                </div>
+                <button
+                  id="close-share-panel-btn"
+                  type="button"
+                  class="task-action-btn"
+                  data-i18n="share.close"
+                >
+                  Close
+                </button>
+              </div>
+
+              <form id="share-board-form" class="share-form">
+                <div class="input-group">
+                  <label for="share-role" data-i18n="share.role_label">Permission</label>
+                  <select id="share-role" name="role">
+                    <option value="viewer" data-i18n="share.role_viewer">Viewer</option>
+                    <option value="editor" data-i18n="share.role_editor">Editor</option>
+                  </select>
+                </div>
+
+                <button type="submit" class="auth-btn" data-i18n="share.create_link">
+                  Create share link
+                </button>
+              </form>
+
+              <div
+                id="share-message"
+                class="message"
+                role="status"
+                aria-live="polite"
+              ></div>
+
+              <div id="share-link-box" class="share-link-box hidden">
+                <label for="share-link-input" data-i18n="share.link_label">Share this link</label>
+                <input id="share-link-input" type="text" readonly />
+              </div>
+            </section>
 
             <div id="board-columns" class="board-columns"></div>
           </section>
