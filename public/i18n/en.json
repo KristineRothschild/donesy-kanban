@@ -78,6 +78,11 @@
   "share.create_link": "Create share link",
   "share.link_label": "Share this link",
 
+  "offline.board_cached_message": "Showing the last opened board from offline cache. Editing is disabled.",
+  "offline.board_cached_saved_at": "Last synced {date}.",
+  "offline.boards_cached_message": "Showing cached boards. Only the last opened board is available offline.",
+  "offline.board_unavailable": "Only the last opened board is available offline.",
+
   "tasks.new_task_button": "New task",
   "tasks.title_label": "Task title",
   "tasks.title_placeholder": "Write task title",

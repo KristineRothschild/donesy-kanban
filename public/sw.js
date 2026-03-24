@@ -1,4 +1,4 @@
-const CACHE_NAME = "donesy-static-v2";
+const CACHE_NAME = "donesy-static-v3";
 
 const STATIC_ASSETS = [
   "/",
@@ -10,6 +10,7 @@ const STATIC_ASSETS = [
   "/components/userEdit.mjs",
   "/components/userDelete.mjs",
   "/services/apiClient.mjs",
+  "/services/offlineCache.mjs",
   "/services/router.mjs",
   "/services/i18n.mjs",
   "/models/userModel.mjs",

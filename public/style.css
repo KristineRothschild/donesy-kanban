@@ -317,6 +317,13 @@ body {
   color: #721c24;
 }
 
+.message.info {
+  display: block;
+  background-color: rgba(228, 240, 251, 0.96);
+  color: #234a69;
+  border: 1px solid rgba(74, 123, 167, 0.2);
+}
+
 .switch-text {
   text-align: center;
   margin-top: 20px;

@@ -78,6 +78,11 @@
   "share.create_link": "LAG DELINGSLENKE",
   "share.link_label": "Del denne lenken",
 
+  "offline.board_cached_message": "Viser sist aapnede board fra offline-cache. Redigering er deaktivert.",
+  "offline.board_cached_saved_at": "Sist synkronisert {date}.",
+  "offline.boards_cached_message": "Viser cachede boards. Bare sist aapnede board er tilgjengelig offline.",
+  "offline.board_unavailable": "Bare sist aapnede board er tilgjengelig offline.",
+
   "tasks.new_task_button": "Ny task",
   "tasks.title_label": "Task-tittel",
   "tasks.title_placeholder": "Skriv task-tittel",

@@ -16,6 +16,16 @@ import {
   logoutUser,
 } from "../services/apiClient.mjs";
 import { getUser, setUser, clearUser } from "../models/userModel.mjs";
+import {
+  clearOfflineBoardSnapshot,
+  clearOfflineCache,
+  getOfflineBoardSnapshot,
+  getOfflineBoards,
+  getOfflineBootstrap,
+  saveOfflineBoardSnapshot,
+  saveOfflineBoards,
+  saveOfflineUser,
+} from "../services/offlineCache.mjs";
 import { registerView, navigateTo, onNavigate } from "../services/router.mjs";
 import { ready, t, translatePage } from "../services/i18n.mjs";
 
@@ -85,6 +95,8 @@ let activeCreateColumnId = null;
 let editingTaskId = null;
 let draggedTaskId = null;
 let activeDropColumnId = null;
+let isOfflineSnapshotMode = false;
+let offlineSnapshotSavedAt = null;
 
 function showMessage(element, text, type) {
   element.textContent = text;
@@ -94,6 +106,123 @@ function showMessage(element, text, type) {
 function hideMessage(element) {
   element.className = "message";
   element.textContent = "";
+}
+
+function shouldUseOfflineFallback(error) {
+  return !navigator.onLine || error instanceof TypeError;
+}
+
+function formatSavedAt(value) {
+  if (!value) {
+    return "";
+  }
+
+  const parsedDate = new Date(value);
+  if (Number.isNaN(parsedDate.getTime())) {
+    return "";
+  }
+
+  return new Intl.DateTimeFormat(document.documentElement.lang || "en", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(parsedDate);
+}
+
+function syncOfflineUiState() {
+  toggleBoardFormBtn.classList.toggle(
+    "hidden",
+    isOfflineSnapshotMode || !createBoardForm.classList.contains("hidden"),
+  );
+  openAccountBtn.classList.toggle("hidden", isOfflineSnapshotMode);
+  boardAccountBtn.classList.toggle("hidden", isOfflineSnapshotMode);
+}
+
+function setOfflineSnapshotMode(isEnabled, savedAt = null) {
+  isOfflineSnapshotMode = isEnabled;
+  offlineSnapshotSavedAt = isEnabled ? savedAt : null;
+
+  if (isEnabled) {
+    setBoardFormVisibility(false);
+    setBoardEditPanelVisibility(false);
+    setSharePanelVisibility(false);
+  }
+
+  syncOfflineUiState();
+}
+
+function persistBoardsState() {
+  const currentUser = getUser();
+  if (!currentUser) {
+    return;
+  }
+
+  saveOfflineBoards(currentUser.id, boardListState);
+}
+
+function persistCurrentBoardSnapshot() {
+  const currentUser = getUser();
+  if (!currentUser || !currentBoardState) {
+    return;
+  }
+
+  saveOfflineBoardSnapshot(
+    currentUser.id,
+    currentBoardState,
+    currentBoardColumnsState,
+    currentBoardTasksState,
+  );
+}
+
+function showOfflineBoardMessage() {
+  let message = t("offline.board_cached_message");
+  const savedAt = formatSavedAt(offlineSnapshotSavedAt);
+  if (savedAt) {
+    message += " " + t("offline.board_cached_saved_at").replace("{date}", savedAt);
+  }
+
+  showMessage(boardDetailMessage, message, "info");
+}
+
+function applyBoardData(board, columns, tasks, { offline = false, savedAt = null } = {}) {
+  currentBoardState = board;
+  currentBoardColumnsState = columns;
+  currentBoardTasksState = tasks;
+  setOfflineSnapshotMode(offline, savedAt);
+
+  if (!offline) {
+    hideMessage(boardDetailMessage);
+    persistCurrentBoardSnapshot();
+  }
+
+  renderCurrentBoard();
+}
+
+function restoreOfflineBootstrap() {
+  const bootstrap = getOfflineBootstrap();
+  if (!bootstrap) {
+    return false;
+  }
+
+  const { user, boards, boardSnapshot } = bootstrap;
+  setAuthenticatedUser(user);
+  boardListState = Array.isArray(boards) ? boards : [];
+
+  if (!boardListState.some((board) => board.id === boardSnapshot.boardId)) {
+    boardListState.unshift(boardSnapshot.board);
+  }
+
+  selectedBoardId = boardSnapshot.boardId;
+  applyBoardData(
+    boardSnapshot.board,
+    boardSnapshot.columns,
+    boardSnapshot.tasks,
+    {
+      offline: true,
+      savedAt: boardSnapshot.savedAt,
+    },
+  );
+  navigateTo("board");
+  return true;
 }
 
 function showLoginSection() {
@@ -159,14 +288,26 @@ function formatDateValue(value) {
 }
 
 function canEditCurrentBoard() {
+  if (isOfflineSnapshotMode) {
+    return false;
+  }
+
   return currentBoardState?.role === "owner" || currentBoardState?.role === "editor";
 }
 
 function canShareCurrentBoard() {
+  if (isOfflineSnapshotMode) {
+    return false;
+  }
+
   return currentBoardState?.role === "owner";
 }
 
 function canDeleteCurrentBoard() {
+  if (isOfflineSnapshotMode) {
+    return false;
+  }
+
   return currentBoardState?.role === "owner";
 }
 
@@ -175,6 +316,10 @@ function canRequestReview() {
 }
 
 function canEditBoardSettings() {
+  if (isOfflineSnapshotMode) {
+    return false;
+  }
+
   return currentBoardState?.role === "owner";
 }
 
@@ -219,7 +364,7 @@ function updateBoardState(boardId, updates) {
 
 function setBoardFormVisibility(isVisible) {
   createBoardForm.classList.toggle("hidden", !isVisible);
-  toggleBoardFormBtn.classList.toggle("hidden", isVisible);
+  toggleBoardFormBtn.classList.toggle("hidden", isVisible || isOfflineSnapshotMode);
 
   if (!isVisible) {
     createBoardForm.reset();
@@ -286,6 +431,10 @@ function renderCurrentBoard() {
   }
 
   renderBoardDetail(currentBoardState, currentBoardColumnsState, currentBoardTasksState);
+
+  if (isOfflineSnapshotMode) {
+    showOfflineBoardMessage();
+  }
 }
 
 function focusCreateTaskForm(columnId) {
@@ -324,6 +473,7 @@ function clearBoardsView() {
   currentBoardColumnsState = [];
   currentBoardTasksState = [];
   resetTaskUiState();
+  setOfflineSnapshotMode(false);
   setBoardFormVisibility(false);
   setBoardEditPanelVisibility(false);
   setSharePanelVisibility(false);
@@ -738,16 +888,36 @@ async function loadBoardDetail(boardId) {
   selectedBoardId = boardId;
   renderBoards(boardListState);
 
-  const board = await fetchBoard(boardId);
-  const [columns, tasks] = await Promise.all([
-    fetchBoardColumns(boardId),
-    fetchBoardTasks(boardId),
-  ]);
+  try {
+    const board = await fetchBoard(boardId);
+    const [columns, tasks] = await Promise.all([
+      fetchBoardColumns(boardId),
+      fetchBoardTasks(boardId),
+    ]);
 
-  currentBoardState = board;
-  currentBoardColumnsState = columns;
-  currentBoardTasksState = tasks;
-  renderBoardDetail(board, columns, tasks);
+    applyBoardData(board, columns, tasks);
+  } catch (error) {
+    const currentUser = getUser();
+    const cachedSnapshot = currentUser ? getOfflineBoardSnapshot(currentUser.id, boardId) : null;
+
+    if (!shouldUseOfflineFallback(error)) {
+      throw error;
+    }
+
+    if (!cachedSnapshot) {
+      throw new Error(t("offline.board_unavailable"));
+    }
+
+    applyBoardData(
+      cachedSnapshot.board,
+      cachedSnapshot.columns,
+      cachedSnapshot.tasks,
+      {
+        offline: true,
+        savedAt: cachedSnapshot.savedAt,
+      },
+    );
+  }
 }
 
 async function refreshCurrentBoardTasks() {
@@ -756,6 +926,9 @@ async function refreshCurrentBoardTasks() {
   }
 
   currentBoardTasksState = await fetchBoardTasks(selectedBoardId);
+  setOfflineSnapshotMode(false);
+  hideMessage(boardDetailMessage);
+  persistCurrentBoardSnapshot();
   renderCurrentBoard();
 }
 
@@ -849,6 +1022,7 @@ async function handleBoardColumnsDrop(event) {
 
   try {
     await updateTask(taskId, { columnId });
+    persistCurrentBoardSnapshot();
   } catch (error) {
     currentBoardTasksState = previousTasksState;
     renderCurrentBoard();
@@ -857,20 +1031,39 @@ async function handleBoardColumnsDrop(event) {
 }
 
 async function loadBoards() {
-  const boards = await fetchBoards();
-  boardListState = boards;
+  try {
+    const boards = await fetchBoards();
+    boardListState = boards;
+    setOfflineSnapshotMode(false);
+    persistBoardsState();
+    hideMessage(boardMessage);
 
-  if (boards.length === 0) {
-    clearBoardsView();
-    renderBoards([]);
-    return;
+    if (boards.length === 0) {
+      clearOfflineBoardSnapshot();
+      clearBoardsView();
+      renderBoards([]);
+      return;
+    }
+
+    renderBoards(boards);
+  } catch (error) {
+    const currentUser = getUser();
+    const cachedBoards = currentUser ? getOfflineBoards(currentUser.id) : null;
+
+    if (!shouldUseOfflineFallback(error) || !Array.isArray(cachedBoards)) {
+      throw error;
+    }
+
+    boardListState = cachedBoards;
+    setOfflineSnapshotMode(true, offlineSnapshotSavedAt);
+    renderBoards(cachedBoards);
+    showMessage(boardMessage, t("offline.boards_cached_message"), "info");
   }
-
-  renderBoards(boards);
 }
 
 function setAuthenticatedUser(user) {
   setUser(user);
+  saveOfflineUser(user);
   showUserInfo(user);
 }
 
@@ -940,6 +1133,7 @@ async function handleLogin(event) {
 async function handleLogout() {
   try {
     await logoutUser();
+    clearOfflineCache();
     goToLogin({ resetForm: true });
   } catch (error) {
     console.error(error);
@@ -953,6 +1147,7 @@ function handleUserUpdated(event) {
 }
 
 function handleUserDeleted() {
+  clearOfflineCache();
   goToLogin({ resetForm: true });
 }
 
@@ -1047,6 +1242,8 @@ async function handleCreateShareLink(event) {
     shareLinkInput.value = invite.inviteUrl;
     shareLinkBox.classList.remove("hidden");
     updateBoardState(selectedBoardId, { visibility: "shared" });
+    persistBoardsState();
+    persistCurrentBoardSnapshot();
     renderCurrentBoard();
   } catch (error) {
     showMessage(shareMessage, error.message, "error");
@@ -1076,6 +1273,8 @@ async function handleUpdateBoard(event) {
       visibility: board.visibility,
       role: board.role,
     });
+    persistBoardsState();
+    persistCurrentBoardSnapshot();
     renderBoards(boardListState);
     renderCurrentBoard();
     setBoardEditPanelVisibility(false);
@@ -1100,6 +1299,8 @@ async function handleDeleteBoard() {
     await deleteBoard(boardId);
 
     boardListState = boardListState.filter((board) => board.id !== boardId);
+    persistBoardsState();
+    clearOfflineBoardSnapshot(boardId);
     selectedBoardId = null;
     currentBoardState = null;
     currentBoardColumnsState = [];
@@ -1270,6 +1471,13 @@ function handleNavigation(viewName) {
     setBoardEditPanelVisibility(false);
     setSharePanelVisibility(false);
     showUserInfo(currentUser);
+
+    if (isOfflineSnapshotMode && !navigator.onLine && boardListState.length > 0) {
+      renderBoards(boardListState);
+      showMessage(boardMessage, t("offline.boards_cached_message"), "info");
+      return;
+    }
+
     loadBoards().catch((error) => {
       showMessage(boardMessage, error.message, "error");
     });
@@ -1283,13 +1491,23 @@ function handleNavigation(viewName) {
       return;
     }
 
+    if (isOfflineSnapshotMode && !navigator.onLine && currentBoardState?.id === selectedBoardId) {
+      renderCurrentBoard();
+      return;
+    }
+
     loadBoardDetail(selectedBoardId).catch((error) => {
-        showMessage(boardMessage, error.message, "error");
-        navigateTo("boards");
-      });
+      showMessage(boardMessage, error.message, "error");
+      navigateTo("boards");
+    });
   }
 
   if (viewName === "account") {
+    if (isOfflineSnapshotMode) {
+      navigateTo("board");
+      return;
+    }
+
     setBoardEditPanelVisibility(false);
     setSharePanelVisibility(false);
     showUserInfo(currentUser);
@@ -1339,10 +1557,13 @@ async function init() {
     if (user) {
       await goToBoards(user);
     } else {
+      clearOfflineCache();
       goToLogin();
     }
   } catch (error) {
-    goToLogin();
+    if (!restoreOfflineBootstrap()) {
+      goToLogin();
+    }
   }
 
   onNavigate(handleNavigation);
