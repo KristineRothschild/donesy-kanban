@@ -24,6 +24,33 @@ export function createBoardRoutes({ boardsService, tasksService }) {
     }
   });
 
+  router.post("/:boardId/invites", async (req, res, next) => {
+    try {
+      const userId = getSessionUserId(req);
+      const boardId = parseInt(req.params.boardId, 10);
+      const invite = await boardsService.createInviteForOwner(boardId, userId, req.body.role);
+      const inviteUrl = `${req.protocol}://${req.get("host")}/?invite=${invite.token}`;
+      res.status(201).json({
+        invite: {
+          ...invite,
+          inviteUrl,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.post("/invites/:token/accept", async (req, res, next) => {
+    try {
+      const userId = getSessionUserId(req);
+      const board = await boardsService.acceptInviteForUser(req.params.token, userId);
+      res.json({ board });
+    } catch (error) {
+      next(error);
+    }
+  });
+
   router.get("/:boardId/columns", async (req, res, next) => {
     try {
       const userId = getSessionUserId(req);

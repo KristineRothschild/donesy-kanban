@@ -1,12 +1,14 @@
+import { randomBytes } from "node:crypto";
 import { ForbiddenError, NotFoundError, ValidationError } from "../middleware.mjs";
 
-function toBoardResponse(board) {
+function toBoardResponse(board, role = "owner") {
   return {
     id: board.id,
     name: board.name,
     description: board.description,
     ownerId: board.owner_id,
     visibility: board.visibility,
+    role,
     createdAt: board.created_at,
     updatedAt: board.updated_at,
   };
@@ -22,6 +24,7 @@ function toColumnResponse(row) {
 }
 
 const DEFAULT_COLUMN_NAMES = ["To Do", "Doing", "Done"];
+const ALLOWED_MEMBER_ROLES = ["viewer", "editor"];
 
 export function createBoardsService({ db }) {
   async function insertDefaultColumns(boardId) {
@@ -69,21 +72,38 @@ export function createBoardsService({ db }) {
     }
   }
 
+  function normalizeMemberRole(role) {
+    if (typeof role !== "string") {
+      throw new ValidationError([{ field: "role", message: "role must be viewer or editor" }]);
+    }
+
+    const normalizedRole = role.trim().toLowerCase();
+    if (!ALLOWED_MEMBER_ROLES.includes(normalizedRole)) {
+      throw new ValidationError([{ field: "role", message: "role must be viewer or editor" }]);
+    }
+
+    return normalizedRole;
+  }
+
   async function getBoardsForUser(userId) {
     const result = await db.query(
-      `SELECT DISTINCT b.*
+      `SELECT DISTINCT b.*,
+              CASE
+                WHEN b.owner_id = $1 THEN 'owner'
+                ELSE m.role
+              END AS access_role
        FROM boards b
        LEFT JOIN board_members m ON m.board_id = b.id AND m.user_id = $1
        WHERE b.owner_id = $1 OR m.user_id IS NOT NULL
        ORDER BY b.id ASC`,
       [userId],
     );
-    return result.rows.map(toBoardResponse);
+    return result.rows.map((row) => toBoardResponse(row, row.access_role || "owner"));
   }
 
   async function getBoardByIdForUser(boardId, userId) {
     const access = await getBoardAccessForUser(boardId, userId);
-    return toBoardResponse(access.board);
+    return toBoardResponse(access.board, access.role);
   }
 
   async function getColumnsForBoard(boardId, userId) {
@@ -132,7 +152,7 @@ export function createBoardsService({ db }) {
 
     const boardRow = result.rows[0];
     await insertDefaultColumns(boardRow.id);
-    return toBoardResponse(boardRow);
+    return toBoardResponse(boardRow, "owner");
   }
 
   async function updateBoardForOwner(boardId, userId, { name, description, visibility }) {
@@ -181,7 +201,7 @@ export function createBoardsService({ db }) {
       [nextName, nextDescription, nextVisibility, boardId],
     );
 
-    return toBoardResponse(result.rows[0]);
+    return toBoardResponse(result.rows[0], "owner");
   }
 
   async function deleteBoardForOwner(boardId, userId) {
@@ -192,12 +212,68 @@ export function createBoardsService({ db }) {
     }
   }
 
+  async function createInviteForOwner(boardId, userId, role) {
+    await assertOwner(boardId, userId);
+
+    const normalizedRole = normalizeMemberRole(role);
+    const token = randomBytes(16).toString("hex");
+
+    await db.query(
+      `INSERT INTO board_invites (board_id, token, role)
+       VALUES ($1, $2, $3)`,
+      [boardId, token, normalizedRole],
+    );
+
+    await db.query(
+      `UPDATE boards
+       SET visibility = 'shared',
+           updated_at = NOW()
+       WHERE id = $1`,
+      [boardId],
+    );
+
+    return {
+      token,
+      role: normalizedRole,
+    };
+  }
+
+  async function acceptInviteForUser(token, userId) {
+    const result = await db.query(
+      `SELECT i.board_id, i.role, b.*
+       FROM board_invites i
+       JOIN boards b ON b.id = i.board_id
+       WHERE i.token = $1`,
+      [token],
+    );
+    const invite = result.rows[0];
+
+    if (!invite) {
+      throw new NotFoundError("Invite", token);
+    }
+
+    if (invite.owner_id !== userId) {
+      await db.query(
+        `INSERT INTO board_members (board_id, user_id, role)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (board_id, user_id)
+         DO UPDATE SET role = EXCLUDED.role`,
+        [invite.board_id, userId, invite.role],
+      );
+    }
+
+    const role = invite.owner_id === userId ? "owner" : invite.role;
+    return toBoardResponse(invite, role);
+  }
+
   return {
     getBoardAccessForUser,
     getBoardsForUser,
     getBoardByIdForUser,
     getColumnsForBoard,
     createBoard,
+    createInviteForOwner,
+    acceptInviteForUser,
     updateBoardForOwner,
     deleteBoardForOwner,
   };
