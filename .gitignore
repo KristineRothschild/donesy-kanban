@@ -8,3 +8,5 @@ assignmentDesc.txt
 
 .env
 .env.*
+
+.DS_Store
