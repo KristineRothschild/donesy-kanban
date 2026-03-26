@@ -41,6 +41,41 @@ export function createBoardRoutes({ boardsService, tasksService }) {
     }
   });
 
+  router.get("/:boardId/members", async (req, res, next) => {
+    try {
+      const userId = getSessionUserId(req);
+      const boardId = parseInt(req.params.boardId, 10);
+      const members = await boardsService.getMembersForOwner(boardId, userId);
+      res.json({ members });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.put("/:boardId/members/:memberUserId", async (req, res, next) => {
+    try {
+      const userId = getSessionUserId(req);
+      const boardId = parseInt(req.params.boardId, 10);
+      const memberUserId = parseInt(req.params.memberUserId, 10);
+      const member = await boardsService.updateMemberRoleForOwner(boardId, userId, memberUserId, req.body.role);
+      res.json({ member });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.delete("/:boardId/members/:memberUserId", async (req, res, next) => {
+    try {
+      const userId = getSessionUserId(req);
+      const boardId = parseInt(req.params.boardId, 10);
+      const memberUserId = parseInt(req.params.memberUserId, 10);
+      await boardsService.removeMemberForOwner(boardId, userId, memberUserId);
+      res.status(204).send();
+    } catch (error) {
+      next(error);
+    }
+  });
+
   router.post("/invites/:token/accept", async (req, res, next) => {
     try {
       const userId = getSessionUserId(req);

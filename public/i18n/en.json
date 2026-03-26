@@ -77,6 +77,11 @@
   "share.role_editor": "Editor",
   "share.create_link": "Create share link",
   "share.link_label": "Share this link",
+  "share.members_title": "Members",
+  "share.members_empty": "No members have joined this board yet.",
+  "share.members_loading": "Loading members...",
+  "share.remove_member": "Remove",
+  "share.remove_member_confirm": "Remove this member from the board?",
 
   "offline.board_cached_message": "Showing the last opened board from offline cache. Editing is disabled.",
   "offline.board_cached_saved_at": "Last synced {date}.",

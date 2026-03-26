@@ -77,6 +77,11 @@
   "share.role_editor": "Editor",
   "share.create_link": "LAG DELINGSLENKE",
   "share.link_label": "Del denne lenken",
+  "share.members_title": "Medlemmer",
+  "share.members_empty": "Ingen medlemmer har blitt lagt til på dette boardet ennå.",
+  "share.members_loading": "Laster medlemmer...",
+  "share.remove_member": "Fjern",
+  "share.remove_member_confirm": "Fjern dette medlemmet fra boardet?",
 
   "offline.board_cached_message": "Viser sist aapnede board fra offline-cache. Redigering er deaktivert.",
   "offline.board_cached_saved_at": "Sist synkronisert {date}.",

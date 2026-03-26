@@ -23,6 +23,15 @@ function toColumnResponse(row) {
   };
 }
 
+function toBoardMemberResponse(row) {
+  return {
+    userId: row.user_id,
+    name: row.name,
+    email: row.email,
+    role: row.role,
+  };
+}
+
 const DEFAULT_COLUMN_NAMES = ["To Do", "Doing", "Done"];
 const ALLOWED_MEMBER_ROLES = ["viewer", "editor"];
 
@@ -238,6 +247,57 @@ export function createBoardsService({ db }) {
     };
   }
 
+  async function getMembersForOwner(boardId, userId) {
+    await assertOwner(boardId, userId);
+
+    const result = await db.query(
+      `SELECT m.user_id, u.name, u.email, m.role
+       FROM board_members m
+       JOIN users u ON u.id = m.user_id
+       WHERE m.board_id = $1
+       ORDER BY u.name ASC, u.email ASC`,
+      [boardId],
+    );
+
+    return result.rows.map(toBoardMemberResponse);
+  }
+
+  async function updateMemberRoleForOwner(boardId, userId, memberUserId, role) {
+    await assertOwner(boardId, userId);
+
+    const normalizedRole = normalizeMemberRole(role);
+    const result = await db.query(
+      `UPDATE board_members
+       SET role = $1
+       WHERE board_id = $2 AND user_id = $3
+       RETURNING user_id, role`,
+      [normalizedRole, boardId, memberUserId],
+    );
+
+    if (result.rowCount === 0) {
+      throw new ValidationError([], "Member not found on this board");
+    }
+
+    return {
+      userId: result.rows[0].user_id,
+      role: result.rows[0].role,
+    };
+  }
+
+  async function removeMemberForOwner(boardId, userId, memberUserId) {
+    await assertOwner(boardId, userId);
+
+    const result = await db.query(
+      `DELETE FROM board_members
+       WHERE board_id = $1 AND user_id = $2`,
+      [boardId, memberUserId],
+    );
+
+    if (result.rowCount === 0) {
+      throw new ValidationError([], "Member not found on this board");
+    }
+  }
+
   async function acceptInviteForUser(token, userId) {
     const result = await db.query(
       `SELECT i.board_id, i.role, b.*
@@ -273,6 +333,9 @@ export function createBoardsService({ db }) {
     getColumnsForBoard,
     createBoard,
     createInviteForOwner,
+    getMembersForOwner,
+    updateMemberRoleForOwner,
+    removeMemberForOwner,
     acceptInviteForUser,
     updateBoardForOwner,
     deleteBoardForOwner,

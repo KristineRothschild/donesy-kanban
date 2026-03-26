@@ -697,6 +697,66 @@ main {
   color: #2d5a7b;
 }
 
+.share-members-section {
+  margin-top: 18px;
+}
+
+.share-members-header h4 {
+  color: #2d5a7b;
+  margin-bottom: 10px;
+}
+
+.share-members-empty {
+  margin: 0;
+  padding: 14px;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.5);
+  color: #4a6a85;
+}
+
+.share-members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.share-member-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 12px;
+  background-color: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(74, 123, 167, 0.14);
+}
+
+.share-member-details {
+  min-width: 0;
+}
+
+.share-member-name {
+  color: #2d5a7b;
+  font-weight: bold;
+}
+
+.share-member-email {
+  color: #4a6a85;
+  font-size: 0.95rem;
+  word-break: break-word;
+}
+
+.share-member-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.share-member-controls select {
+  min-width: 120px;
+}
+
 .board-columns {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -930,6 +990,12 @@ main {
 
   .board-detail-header {
     flex-direction: column;
+  }
+
+  .share-member-item,
+  .share-member-controls {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
 

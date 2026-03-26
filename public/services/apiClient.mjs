@@ -104,6 +104,20 @@ export async function createBoardInvite(boardId, role) {
   return data.invite;
 }
 
+export async function fetchBoardMembers(boardId) {
+  const data = await apiRequest(`/boards/${boardId}/members`, "GET", null);
+  return data.members;
+}
+
+export async function updateBoardMemberRole(boardId, memberUserId, role) {
+  const data = await apiRequest(`/boards/${boardId}/members/${memberUserId}`, "PUT", { role });
+  return data.member;
+}
+
+export async function removeBoardMember(boardId, memberUserId) {
+  await apiRequest(`/boards/${boardId}/members/${memberUserId}`, "DELETE", null);
+}
+
 export async function acceptBoardInvite(token) {
   const data = await apiRequest(`/boards/invites/${token}/accept`, "POST", null);
   return data.board;
